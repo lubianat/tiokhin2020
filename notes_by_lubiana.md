@@ -69,6 +69,11 @@ The same applies for all uppercase, like `A_PROB`
 I will make separate_like_this and lowercase the standard. 
 
 
+* Loop runs and whoever is running the code is left lost
+
+It is nice when running code that might take long to add progress bars. 
+One option is the [progress R pakage](https://github.com/r-lib/progress).
+
 ### Actual problems
 
 #### 1 

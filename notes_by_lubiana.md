@@ -27,8 +27,8 @@ an older version on GitHub.
 
 In the process, I'll share my notes.
 
-### "Experimental_Manip..."
-
+## "Experimental_Manip..."
+### Notes
 * Some comments are clutter that can be removed for clarity. For example: 
     #load libraries
     #set sci ids
@@ -41,6 +41,8 @@ I have removed at first the ones that could be removed right away.
 
 * For some comments, it is better to change the variable names before removing. For example:
     num_questions ---> number_of_questions
+    sci_ids ---> ids_for_scientists
+    payoff_v ---> initial_payoffs
     tt.all ---> ? (baybe baseline_for_something?)
     t.all <- scientist_df$ss*sample_cost + startup_cost #tracker
 
@@ -51,4 +53,28 @@ There is a lot of commented out code. This kind of code cannot be sistematically
 I will *REMOVE* commented out code for now. It is stored in the version control system. 
 If you really want to have it, we can deploy it as options in some function. 
 
+
+* Mixed notations make code harder to read
+
+Even though computers do not care, humans prefer it variables and functions follow some 
+standard. For example separate_like_this, or SeparateLikeThis or even separate.like.this . 
+Mixing is confusing, specially whent using dots, as they are sometimes using for **method calls**. 
+For example:
+* scientist_df 
+* questions.q_id 
+* tt.all
+
+I will make separate_like_this the standard. 
+
+
+### Actual problems
+
+#### 1 
+
+`#set payoffs to 0 at beginning of each run
+ payoff_v <- rep(0.0000001, length = length(samplesizes)) `
+ 
+ The comment does not match the code. Should it be 0 or  0.0000001?
+ I have removed the comment and     payoff_v ---> initial_payoffs
+  
 

@@ -19,30 +19,30 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
     samplesizes <- round(runif(num_players, min_sample_size, max_sample_size)) # sample sizes
   }
   
-  sci_ids <- 1:length(samplesizes)
+  ids_for_scientists <- 1:length(samplesizes)
   
-  num_questions <- round((lifespan / (startup_cost + 2)) * num_players) + 1000
+  number_of_questions <- round((lifespan / (startup_cost + 2)) * num_players) + 1000
   
   #set payoffs to 0 at beginning of each run
-  payoff_v <- rep(0.0000001, length = length(samplesizes)) 
+  initial_payoffs <- rep(0.0000001, length = length(samplesizes)) 
   
   scientist_df <- data.frame(sci_id = sci_ids,
                              ss = samplesizes, 
                              question = 0,
                              abandon_prob = abandon_prob, 
-                             payoff = payoff_v, 
+                             payoff = initial_payoffs, 
                              scooped = 0, 
                              num_players = num_players)
   
-  results_m <- as.matrix(data.frame(q_id = rep(0, num_questions * max_players_per_q),
+  results_m <- as.matrix(data.frame(q_id = rep(0, number_of_questions * max_players_per_q),
                                     sci_id = 0,
                                     ss = 0,
                                     result = 0))
   
   #vectors to store information about questions
-  questions.q_id <- seq_len(num_questions) 
-  questions.n_on_q <- rep(0, num_questions)
-  questions.esize <- round(rexp(num_questions, exp_shape), 1)
+  questions.q_id <- seq_len(number_of_questions) 
+  questions.n_on_q <- rep(0, number_of_questions)
+  questions.esize <- round(rexp(number_of_questions, exp_shape), 1)
   
   t <- 1 #starting time period
   tt.all <- scientist_df$ss*sample_cost + startup_cost #baseline

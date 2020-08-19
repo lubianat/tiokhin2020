@@ -29,7 +29,8 @@ In the process, I'll share my notes.
 
 ## "Experimental_Manip..."
 ### Notes
-* Some comments are clutter that can be removed for clarity. For example: 
+
+#### Some comments are clutter that can be removed for clarity. For example: 
   ` #load libraries
     #set sci ids
     #set number of questions
@@ -39,7 +40,7 @@ In the process, I'll share my notes.
 
 I have removed at first the ones that could be removed right away. 
 
-* For some comments, it is better to change the variable names before removing. For example:
+#### For some comments, it is better to change the variable names before removing. For example:
     num_questions ---> number_of_questions
     sci_ids ---> ids_for_scientists
     payoff_v ---> initial_payoffs
@@ -47,14 +48,14 @@ I have removed at first the ones that could be removed right away.
     t.all <- scientist_df$ss*sample_cost + startup_cost #tracker
 
 
-* Commented out code is bad
+#### Commented out code is bad
 
 There is a lot of commented out code. This kind of code cannot be sistematically tested. 
 I will *REMOVE* commented out code for now. It is stored in the version control system. 
 If you really want to have it, we can deploy it as options in some function. 
 
 
-* Mixed notations make code harder to read
+#### Mixed notations make code harder to read
 
 Even though computers do not care, humans prefer it variables and functions follow some 
 standard. For example separate_like_this, or SeparateLikeThis or even separate.like.this . 
@@ -68,8 +69,7 @@ The same applies for all uppercase, like `A_PROB`
 
 I will make separate_like_this and lowercase the standard. 
 
-
-* Loop runs and whoever is running the code is left lost
+#### Loop runs and whoever is running the code is left lost
 
 It is nice when running code that might take long to add progress bars. 
 One option is the [progress R pakage](https://github.com/r-lib/progress).

@@ -223,9 +223,20 @@ dcy <- c(0.15, 10)
 min_sample_size <- 3
 max_sample_size <- 12
 
+library("progress")
+
 for (c in comps) {
-  for (d in dcy) {
+   print(paste("Running comp =", c, "; Out of "))
+   cat(comps, "\n")
+
+    for (d in dcy) {
+      print(paste("Running dcy =", d, "; Out of "))
+      cat(dcy, "\n")
+      
     for (players in popsize) {
+        print(paste("Running players =", players, "; Out of "))
+        cat(popsize, "\n")
+      
       dum_list <- vector(mode = "list", length = 200)
       tracker <- 1
       
@@ -240,7 +251,13 @@ for (c in comps) {
         )
       
       if (players == 120) {
-        for (rep in 1:25) {
+        number_of_loops <- 25
+        pb_for_120 <- progress_bar$new(
+          format = "  [:bar] :percent eta: :eta",
+          total = number_of_loops)
+        
+        for (rep in 1:number_of_loops) {
+          pb_for_120$tick()
           #                        evol, life,    ss, max_players_per_q, SUC, SAMP_C,  exp_shape, decay, b_neg, abandon
           RR <-
             play_complexcomp(0,    15000,    NA,       c,         100,       1,     5,        d,     1,   a_prob)
@@ -249,7 +266,11 @@ for (c in comps) {
         }
         
       } else if (players == 960) {
+        number_of_loops <- 10
+        pb_for_960 <- progress_bar$new(format = "  downloading [:bar] :percent eta: :eta",
+                                       total = number_of_loops)
         for (rep in 1:10) {
+          pb_for_960$tick()
           #                        evol, life,    ss, max_players_per_q, SUC, SAMP_C,  exp_shape, decay, b_neg, abandon
           RR <-
             play_complexcomp(0,    15000,    NA,       c,         100,       1,     5,        d,     1,   a_prob)

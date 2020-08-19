@@ -21,6 +21,7 @@ play_complexcomp <-
            decay,
            b_neg,
            abandon_prob) {
+
     if (evolution == 1) {
       samplesizes <- ss
     } else {
@@ -33,7 +34,6 @@ play_complexcomp <-
     number_of_questions <-
       round((lifespan / (startup_cost + 2)) * num_players) + 1000
     
-    #set payoffs to 0 at beginning of each run
     initial_payoffs <- rep(0.0000001, length = length(samplesizes))
     
     scientist_df <- data.frame(
@@ -54,18 +54,18 @@ play_complexcomp <-
         result = 0
       ))
     
-    #vectors to store information about questions
     questions_q_id <- seq_len(number_of_questions)
     questions_n_on_q <- rep(0, number_of_questions)
     questions_e_size <- round(rexp(number_of_questions, exp_shape), 1)
     
-    t <- 1 #starting time period
-    tt_all <- scientist_df$ss * sample_cost + startup_cost #baseline
-    t_all <- scientist_df$ss * sample_cost + startup_cost #tracker
+    time_period <- 1 
+    baseline_time <- scientist_df$ss * sample_cost + startup_cost
+    tracker_time <- scientist_df$ss * sample_cost + startup_cost 
     
     #assign scientists to questions and update questions_df with scientists
     scientist_df$question[ids_for_scientists] <-
       rep(questions_q_id, each = max_players_per_q)[ids_for_scientists]
+    
     sci_per_q <- questions_n_on_q
     tab <- table(scientist_df$question)
     sci_per_q[as.integer(names(tab))] <- as.vector(tab)
@@ -76,18 +76,17 @@ play_complexcomp <-
     
     results_tracker_old <- 0
     
-    while (t < lifespan) {
-      time_to_next_event <- min(c(t_all, lifespan - t))
-      t_all <- t_all - time_to_next_event
-      t <- t + time_to_next_event
+    while (time_period < lifespan) {
+      time_to_next_event <- min(c(tracker_time, lifespan - time_period))
+      tracker_time <- tracker_time - time_to_next_event
+      time_period <- time_period + time_to_next_event
       
-      #exit loop when necessary#
-      if (t >= lifespan) {
+      if (time_period >= lifespan) {
         break
       }
       
       samplers <-
-        c(scientist_df$sci_id[t_all == 0]) #id of scientists that can sample
+        c(scientist_df$sci_id[tracker_time == 0]) #id of scientists that can sample
       num_samplers <- length(samplers)
       ques <-
         c(scientist_df$question[samplers]) #question they are working on
@@ -158,7 +157,7 @@ play_complexcomp <-
       }
       
       #reset the time until sampling for the subset of players who sampled
-      t_all[samplers] <- tt_all[samplers]
+      tracker_time[samplers] <- baseline_time[samplers]
       
       #update positions of scientists who are working on questions where there just was published result
       pos_potent_mover <-
@@ -200,7 +199,7 @@ play_complexcomp <-
             scientist_df$question[pos_potent_mover[i]] <-
               next_q #move scientist to new question
             #reset the time until sampling for the subset of players who moved
-            t_all[pos_potent_mover[i]] <- tt_all[pos_potent_mover[i]]
+            tracker_time[pos_potent_mover[i]] <- baseline_time[pos_potent_mover[i]]
           }
         }
       }
@@ -258,7 +257,6 @@ for (c in comps) {
         
         for (rep in 1:number_of_loops) {
           pb_for_120$tick()
-          #                        evol, life,    ss, max_players_per_q, SUC, SAMP_C,  exp_shape, decay, b_neg, abandon
           RR <-
             play_complexcomp(0,    15000,    NA,       c,         100,       1,     5,        d,     1,   a_prob)
           dum_list[tracker] <- RR
@@ -271,7 +269,6 @@ for (c in comps) {
                                        total = number_of_loops)
         for (rep in 1:10) {
           pb_for_960$tick()
-          #                        evol, life,    ss, max_players_per_q, SUC, SAMP_C,  exp_shape, decay, b_neg, abandon
           RR <-
             play_complexcomp(0,    15000,    NA,       c,         100,       1,     5,        d,     1,   a_prob)
           dum_list[tracker] <- RR

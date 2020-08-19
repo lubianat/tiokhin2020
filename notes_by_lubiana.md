@@ -30,12 +30,12 @@ In the process, I'll share my notes.
 ## "Experimental_Manip..."
 ### Notes
 * Some comments are clutter that can be removed for clarity. For example: 
-    #load libraries
+  ` #load libraries
     #set sci ids
     #set number of questions
     #data frames
     #results tracker
-    ###while loop###
+    ###while loop###`
 
 I have removed at first the ones that could be removed right away. 
 
@@ -64,7 +64,9 @@ For example:
 * questions.q_id 
 * tt.all
 
-I will make separate_like_this the standard. 
+The same applies for all uppercase, like `A_PROB`
+
+I will make separate_like_this and lowercase the standard. 
 
 
 ### Actual problems

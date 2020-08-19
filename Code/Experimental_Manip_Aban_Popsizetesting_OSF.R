@@ -40,20 +40,20 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
                                     result = 0))
   
   #vectors to store information about questions
-  questions.q_id <- seq_len(number_of_questions) 
-  questions.n_on_q <- rep(0, number_of_questions)
-  questions.esize <- round(rexp(number_of_questions, exp_shape), 1)
+  questions_q_id <- seq_len(number_of_questions) 
+  questions_n_on_q <- rep(0, number_of_questions)
+  questions_e_size <- round(rexp(number_of_questions, exp_shape), 1)
   
   t <- 1 #starting time period
-  tt.all <- scientist_df$ss*sample_cost + startup_cost #baseline
-  t.all <- scientist_df$ss*sample_cost + startup_cost #tracker
+  tt_all <- scientist_df$ss*sample_cost + startup_cost #baseline
+  t_all <- scientist_df$ss*sample_cost + startup_cost #tracker
 
   #assign scientists to questions and update questions_df with scientists
-  scientist_df$question[sci_ids] <- rep(questions.q_id, each = max_players_per_q)[sci_ids]
-  sci_per_q <- questions.n_on_q
+  scientist_df$question[sci_ids] <- rep(questions_q_id, each = max_players_per_q)[sci_ids]
+  sci_per_q <- questions_n_on_q
   tab <- table(scientist_df$question)
   sci_per_q[as.integer(names(tab))] <- as.vector(tab)
-  questions.n_on_q <- sci_per_q
+  questions_n_on_q <- sci_per_q
   
   #will store unique q_ids for published results
   prev_pub_q <- vector()
@@ -62,19 +62,19 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
   
   while (t < lifespan) {
     
-    time_to_next_event <- min(c(t.all, lifespan-t))
-    t.all <- t.all - time_to_next_event
+    time_to_next_event <- min(c(t_all, lifespan-t))
+    t_all <- t_all - time_to_next_event
     t <- t + time_to_next_event
     
     #exit loop when necessary#
     if(t >= lifespan){break}
     
-    samplers <- c(scientist_df$sci_id[t.all == 0]) #id of scientists that can sample
+    samplers <- c(scientist_df$sci_id[t_all == 0]) #id of scientists that can sample
     num_samplers <- length(samplers)
     ques <- c(scientist_df$question[samplers]) #question they are working on
     ss_of_samplers <- scientist_df$ss[samplers]
     
-    powers <- as.numeric(pwr.t.test(n=ss_of_samplers, d = questions.esize[ques],
+    powers <- as.numeric(pwr.t.test(n=ss_of_samplers, d = questions_e_size[ques],
                                     sig.level=0.05, type="two.sample")[4]$power)
     res <- runif(num_samplers, 0, 1) < powers #checks what result those players got
     
@@ -117,17 +117,17 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
     
     #move scientists who published to subsequent questions
     for(i in 1:num_samplers){
-      dum1 <- questions.n_on_q[1:largest_q_avail] < max_players_per_q
-      dum2 <- questions.q_id[1:largest_q_avail] > max_prev_pub
+      dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
+      dum2 <- questions_q_id[1:largest_q_avail] > max_prev_pub
       dum <- dum1 & dum2
       next_q <- match(TRUE, dum)
-      questions.n_on_q[ques[i]] <- questions.n_on_q[ques[i]] - 1 #subtract 1 from current 1
-      questions.n_on_q[next_q] <- questions.n_on_q[next_q] + 1 # add 1 to next q
+      questions_n_on_q[ques[i]] <- questions_n_on_q[ques[i]] - 1 #subtract 1 from current 1
+      questions_n_on_q[next_q] <- questions_n_on_q[next_q] + 1 # add 1 to next q
       scientist_df$question[samplers[i]] <- next_q #move scientist to new question
     }
     
     #reset the time until sampling for the subset of players who sampled
-    t.all[samplers] <- tt.all[samplers]
+    t_all[samplers] <- tt_all[samplers]
     
     #update positions of scientists who are working on questions where there just was published result
     pos_potent_mover <- which(scientist_df$question %fin% ques & !scientist_df$sci_id %fin% samplers)
@@ -155,15 +155,15 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
         
         if(any(runif(n_new, 0, 1) < scientist_df$abandon_prob[pos_potent_mover[i]])){
           
-          dum1 <- questions.n_on_q[1:largest_q_avail_movers] < max_players_per_q
-          dum2 <- questions.q_id[1:largest_q_avail_movers] > ineligible_max
+          dum1 <- questions_n_on_q[1:largest_q_avail_movers] < max_players_per_q
+          dum2 <- questions_q_id[1:largest_q_avail_movers] > ineligible_max
           dum <- dum1 & dum2
           next_q <- match(TRUE, dum)
-          questions.n_on_q[question_of_scoopee] <- questions.n_on_q[question_of_scoopee] - 1 #subtract 1 from current 1
-          questions.n_on_q[next_q] <- questions.n_on_q[next_q] + 1 # add 1 to next q
+          questions_n_on_q[question_of_scoopee] <- questions_n_on_q[question_of_scoopee] - 1 #subtract 1 from current 1
+          questions_n_on_q[next_q] <- questions_n_on_q[next_q] + 1 # add 1 to next q
           scientist_df$question[pos_potent_mover[i]] <- next_q #move scientist to new question
           #reset the time until sampling for the subset of players who moved
-          t.all[pos_potent_mover[i]] <- tt.all[pos_potent_mover[i]]
+          t_all[pos_potent_mover[i]] <- tt_all[pos_potent_mover[i]]
         }
       }
     } 
@@ -172,7 +172,7 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
     
   }
   results_df <- as.data.frame(results_m[1:results_tracker_old,])
-  results_df$esize <- questions.esize[match(results_df$q_id, questions.q_id)]
+  results_df$esize <- questions_e_size[match(results_df$q_id, questions_q_id)]
   return(list(scientist_df))
 } 
 
@@ -194,7 +194,7 @@ for(players in popsize){
   
   num_players <- players
   aban_rep_dum <- players / 4
-  A_PROB <- c(rep(0, aban_rep_dum), rep(0.33, aban_rep_dum), rep(0.66, aban_rep_dum), rep(1, aban_rep_dum))
+  a_prob <- c(rep(0, aban_rep_dum), rep(0.33, aban_rep_dum), rep(0.66, aban_rep_dum), rep(1, aban_rep_dum))
   
   if(players == 120){
     for(rep in 1:25){

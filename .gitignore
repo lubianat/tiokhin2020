@@ -37,3 +37,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+Simulated Data Supplementary Materials
+Simulated Data/
+*.zip
+Supplementary Materials
+Plots of Results in Main Text and SI
+*.Rproj*

@@ -8,9 +8,7 @@ library(RColorBrewer)
 library(profvis)
 library(fastmatch)
 
-###################
-###function to play scientists against one another, including measure of number of scoops###
-##################
+###### Function to play scientists against one another, including measure of number of scoops #####
 
 play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup_cost, sample_cost, exp_shape, decay,
                              b_neg, abandon_prob){
@@ -21,16 +19,13 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
     samplesizes <- round(runif(num_players, min_sample_size, max_sample_size)) # sample sizes
   }
   
-  #set sci ids
   sci_ids <- 1:length(samplesizes)
   
-  #set number of questions
   num_questions <- round((lifespan / (startup_cost + 2)) * num_players) + 1000
   
   #set payoffs to 0 at beginning of each run
   payoff_v <- rep(0.0000001, length = length(samplesizes)) 
   
-  #data frames
   scientist_df <- data.frame(sci_id = sci_ids,
                              ss = samplesizes, 
                              question = 0,
@@ -63,10 +58,8 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
   #will store unique q_ids for published results
   prev_pub_q <- vector()
   
-  #results tracker
   results_tracker_old <- 0
   
-  ###while loop###
   while (t < lifespan) {
     
     time_to_next_event <- min(c(t.all, lifespan-t))
@@ -95,7 +88,7 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
       
       ### Adjust the below payoff functions depending on which one you are interested in ###
       
-      #calculate payoff
+      # calculate payoff
       if(res[i]){
         payoff <- novelty_of_res
       } else{

@@ -74,6 +74,15 @@ I will make separate_like_this and lowercase the standard.
 It is nice when running code that might take long to add progress bars. 
 One option is the [progress R pakage](https://github.com/r-lib/progress).
 
+#### Big functions are hard to test
+
+There is a clean code paradigm that each function should do 1 thing and only
+1 thing. The `play_complexcomp` function does way too many things. 
+It will have to be broken into little pieces to actually know if the code really
+does what you say it does on the article. 
+
+
+
 ### Actual problems
 
 #### 1 

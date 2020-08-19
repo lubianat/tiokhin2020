@@ -94,83 +94,6 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
       } else{
         payoff <- novelty_of_res * b_neg
       }
-      
-      # 0 payoff if any other sampler has the same sample size as the focal scientist
-      
-      # if(length(ss_of_samplers[ss_of_samplers == ss_of_samplers[i]]) == 1){
-      #   
-      #   if(res[i]){
-      #     payoff <- novelty_of_res
-      #   } else{
-      #     payoff <- novelty_of_res * b_neg
-      #   }
-      # } else{
-      #   payoff <- 0
-      # }
-      
-      ##make no payoff for ties
-      # if(length(samplers) == 1) {
-      #   
-      #   if(res[i]){
-      #     payoff <- novelty_of_res
-      #   } else{
-      #     payoff <- novelty_of_res * b_neg
-      #   }
-      # } else{
-      #   payoff <- 0
-      # }
-      
-      #make payoff discounted only if two of the same type of SCI IDS, which makes no sense
-      # if(length(unique(samplers)) / length(samplers) == 1) {
-      #   
-      #   if(res[i]){
-      #     payoff <- novelty_of_res
-      #   } else{
-      #     payoff <- novelty_of_res * b_neg
-      #   }
-      # } else{
-      #   payoff <- 0
-      # }
-      
-      ##alternate way of making payoff dependent on number of samplers
-      
-      # if(res[i]){
-      #   payoff <- novelty_of_res / length(samplers)
-      # } else{
-      #   payoff <- (novelty_of_res * b_neg) / length(samplers)
-      # }
-      
-      #adjust payoff based on number of other scientists who currently 
-      #are publishing results on the same question as that scientist scientist is working on, regardless of their sample size
-      # 
-      # num_curent_res_same_q <- length(ques[ques == ques[i]])
-      # 
-      # if(res[i]){
-      #   payoff <- novelty_of_res / num_curent_res_same_q
-      # } else{
-      #   payoff <- (novelty_of_res * b_neg) / num_curent_res_same_q
-      # }
-      
-      ##make payoff 0 if there is at least 1 other scientist on the same question with the same ss
-      
-     # # find which positions of the samplers are working on the same question
-     #  pos_same_q <- which(ques == ques[i]) #which positions guys are working on the same question as me
-     #  ss_of_those_on_same_q <- ss_of_samplers[pos_same_q]
-     # 
-     #  #number of individuals who have the same samples size and are on the same question
-     #  num_same_ss_same_q <- length(ss_of_those_on_same_q[ss_of_those_on_same_q == ss_of_samplers[i]])
-     # 
-     #  if(num_same_ss_same_q == 1){
-     # 
-     #    if(res[i]){
-     #      payoff <- novelty_of_res
-     #    } else{
-     #      payoff <- novelty_of_res * b_neg
-     #    }
-     #  } else {
-     #    payoff <- 0
-     #  }
-
       ### End selection of payoff functions ###
       
       #add payoff to data frame for that sampler
@@ -245,7 +168,6 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
       }
     } 
     
-    #update results tracker
     results_tracker_old <- results_tracker_new
     
   }
@@ -254,7 +176,7 @@ play_complexcomp <- function(evolution, lifespan, ss, max_players_per_q, startup
   return(list(scientist_df))
 } 
 
-###############################
+##### Run the simulation #####
 
 #set simulation parameters
 popsize <- c(120, 960)

@@ -1,4 +1,4 @@
-source("./Code/play_complexcomp.R")
+library(tiokhin2020)
 
 ##### Run the simulation #####
 

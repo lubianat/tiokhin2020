@@ -81,6 +81,20 @@ There is a clean code paradigm that each function should do 1 thing and only
 It will have to be broken into little pieces to actually know if the code really
 does what you say it does on the article. 
 
+#### Files that do multiple things are confusing
+
+The  "Experimental_Manip..." code does two things: present a function (`play_complexcomp`)
+and runs a simulation. 
+
+These are 2 conceptually different things. The end user might be interested in the 
+implementation details, or just how to run the code. 
+
+Ideally, I like the idea of small, personal R packages. That does not take THAT much 
+effort and makes things way clearer and reproducible. 
+I might turn the model into a package. 
+
+For now, I will just split the simulation into two files, `play_complexcomp.R` and 
+`run_simulation_for_play_complexcomp.R`. 
 
 
 ### Actual problems

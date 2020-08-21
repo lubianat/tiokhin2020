@@ -51,25 +51,12 @@ play_complexcomp <-
     ids_for_scientists <- 1:length(sample_sizes)
     initial_payoffs <- rep(0.0000001, length = length(sample_sizes))
 
-    scientist_df <- data.frame(
-      sci_id = ids_for_scientists,
-      ss = sample_sizes,
-      question = 0,
-      abandon_prob = abandon_prob,
-      payoff = initial_payoffs,
-      scooped = 0,
-      num_players = num_players
-    )
-    
+    scientist_df <- get_scientists_data_frame(ids_for_scientists, sample_sizes, abandon_prob, initial_payoffs, num_players)
+
     number_of_questions <- get_number_of_questions(lifespan, startup_cost, num_players)
     
-    results_m <-
-      as.matrix(data.frame(
-        q_id = rep(0, number_of_questions * max_players_per_q),
-        sci_id = 0,
-        ss = 0,
-        result = 0
-      ))
+    results_m <- get_results_matrix(number_of_questions, max_players_per_q)
+
 
     questions_q_id <- seq_len(number_of_questions)
     questions_n_on_q <- rep(0, number_of_questions)
@@ -249,3 +236,23 @@ assign_scientists_to_questions <- function(scientist_df, questions_q_id, max_pla
   return(scientist_df)
 }
 
+get_scientists_data_frame <- function(ids_for_scientists, sample_sizes, abandon_prob, initial_payoffs, num_players) {
+  data.frame(
+    sci_id = ids_for_scientists,
+    ss = sample_sizes,
+    question = 0,
+    abandon_prob = abandon_prob,
+    payoff = initial_payoffs,
+    scooped = 0,
+    num_players = num_players
+  )
+}
+
+get_results_matrix <- function(number_of_questions, max_players_per_q) {
+  as.matrix(data.frame(
+    q_id = rep(0, number_of_questions * max_players_per_q),
+    sci_id = 0,
+    ss = 0,
+    result = 0
+  ))
+}

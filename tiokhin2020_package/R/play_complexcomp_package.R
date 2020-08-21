@@ -88,8 +88,9 @@ play_complexcomp <-
       sampler_ids <- get_sampler_ids(scientist_df, tracker_time) 
 
       num_samplers <- length(sampler_ids)
-      questions_they_are_working_on <-
-        c(scientist_df$question[sampler_ids]) #question they are working on
+      questions_they_are_working_on <- get_questions_they_are_working_on(scientist_df, sampler_ids)
+
+      
       ss_of_samplers <- scientist_df$ss[sampler_ids]
 
       powers <-
@@ -264,4 +265,8 @@ get_questions_n_on_q <- function(number_of_questions, scientist_df) {
 
 get_sampler_ids <- function(scientist_df, tracker_time) {
   c(scientist_df$sci_id[tracker_time == 0]) 
+}
+
+get_questions_they_are_working_on <- function(scientist_df, sampler_ids) {
+  c(scientist_df$question[sampler_ids])
 }

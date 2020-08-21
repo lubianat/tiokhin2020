@@ -55,7 +55,7 @@ play_complexcomp <-
 
     number_of_questions <- get_number_of_questions(lifespan, startup_cost, num_players)
     
-    results_m <- get_results_matrix(number_of_questions, max_players_per_q)
+    results_matrix <- get_results_matrix(number_of_questions, max_players_per_q)
 
     question_ids <- seq_len(number_of_questions)
     
@@ -115,7 +115,7 @@ play_complexcomp <-
       results_tracker_new <- results_tracker_old + number_of_samplers
 
       #update results_m
-      results_m[(results_tracker_old + 1):results_tracker_new, ] <-
+      results_matrix[(results_tracker_old + 1):results_tracker_new, ] <-
         c(questions_they_are_working_on, sampler_ids, ss_of_samplers, results_players_got)
 
       #subset of new question space to search
@@ -189,7 +189,7 @@ play_complexcomp <-
       results_tracker_old <- results_tracker_new
 
     }
-    results_df <- as.data.frame(results_m[1:results_tracker_old, ])
+    results_df <- as.data.frame(results_matrix[1:results_tracker_old, ])
     results_df$esize <-
       questions_e_size[match(results_df$q_id, question_ids)]
     return(list(scientist_df))

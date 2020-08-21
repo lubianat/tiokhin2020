@@ -81,24 +81,23 @@ play_complexcomp <-
     results_matrix <- get_results_matrix(number_of_questions,
                                          max_players_per_q)
     
-    time_period <- 1
+    current_time_period <- 1
+    time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
+    time_cost_for_each_question_at_baseline <- time_cost_for_each_question
     
-    sample_sizes <- scientist_df$ss
-    baseline_time <- sample_sizes * sample_cost + startup_cost
-    tracker_time <- baseline_time
     previously_published_questions <- vector()
     results_tracker_old <- 0
     
-    while (time_period < lifespan) {
-      time_to_next_event <- min(c(tracker_time, lifespan - time_period))
-      tracker_time <- tracker_time - time_to_next_event
-      time_period <- time_period + time_to_next_event
+    while (current_time_period < lifespan) {
+      time_to_next_event <- min(c(time_cost_for_each_question, lifespan - current_time_period))
+      time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
+      current_time_period <- current_time_period + time_to_next_event
       
-      if (time_period >= lifespan) {
+      if (current_time_period >= lifespan) {
         break
       }
       
-      sampler_ids <- get_sampler_ids(scientist_df, tracker_time)
+      sampler_ids <- get_sampler_ids(scientist_df, time_cost_for_each_question)
       number_of_samplers <- length(sampler_ids)
       
       questions_they_are_working_on <-
@@ -175,7 +174,7 @@ play_complexcomp <-
       }
       
       #reset the time until sampling for the subset of players who sampled
-      tracker_time[sampler_ids] <- baseline_time[sampler_ids]
+      time_cost_for_each_question[sampler_ids] <- time_cost_for_each_question_at_baseline[sampler_ids]
       
       #update positions of scientists who are working on questions where there just was published result
       pos_potent_mover <-
@@ -221,8 +220,8 @@ play_complexcomp <-
             scientist_df$question[pos_potent_mover[i]] <-
               next_question #move scientist to new question
             #reset the time until sampling for the subset of players who moved
-            tracker_time[pos_potent_mover[i]] <-
-              baseline_time[pos_potent_mover[i]]
+            time_cost_for_each_question[pos_potent_mover[i]] <-
+              time_cost_for_each_question_at_baseline[pos_potent_mover[i]]
           }
         }
       }

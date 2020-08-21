@@ -126,6 +126,15 @@ I will change that once I finish the R package.
 Some variables are defined in the beginning, but only used much later. This makes it 
 very hard to track what is doing what. 
 
+
+### Never ever publish dummy variable names
+
+Variables like `dum1` and `dum2` are severely frowned upon. They make
+reading the code way more complicated. 
+
+We should always try to come up with meaningful names.
+
+
 # Step 1: 
 
 ## Add tests for the functions

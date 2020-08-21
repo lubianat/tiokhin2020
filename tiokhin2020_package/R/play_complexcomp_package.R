@@ -100,14 +100,10 @@ play_complexcomp <-
       for (i in 1:number_of_samplers) {
 
         num_prior <- count_all_prior_published_results_for_questions(previously_published_questions, questions_they_are_working_on, i) 
-
         novelty_of_result <- calculate_novelty(num_prior, decay)
-
         payoff <- calculate_payoff(results_players_got, i, novelty_of_result, b_neg) 
 
         scientist_df <- add_payoff_to_that_sampler(scientist_df, sampler_ids, i, payoff)
-
-
       }
 
       previously_published_questions <- c(previously_published_questions, questions_they_are_working_on)
@@ -117,7 +113,6 @@ play_complexcomp <-
 
       index_to_update <- (results_tracker_old + 1):results_tracker_new
       set_of_results <- c(questions_they_are_working_on, sampler_ids, ss_of_samplers, results_players_got)
-      
       results_matrix[index_to_update, ] <- set_of_results
         
       #subset of new question space to search
@@ -127,16 +122,20 @@ play_complexcomp <-
 
       #move scientists who published to subsequent questions
       for (i in 1:number_of_samplers) {
-        dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
-        dum2 <- question_ids[1:largest_q_avail] > max_previously_published_questions
-        dum <- dum1 & dum2
-        next_q <- match(TRUE, dum)
+        next_question <- get_next_question(questions_n_on_q, 
+                                    largest_q_avail, 
+                                    max_players_per_q, 
+                                    question_ids, 
+                                    max_previously_published_questions)
+        
         questions_n_on_q[questions_they_are_working_on[i]] <-
-          questions_n_on_q[questions_they_are_working_on[i]] - 1 #subtract 1 from current 1
-        questions_n_on_q[next_q] <-
-          questions_n_on_q[next_q] + 1 # add 1 to next q
+          questions_n_on_q[questions_they_are_working_on[i]] - 1 
+        
+        questions_n_on_q[next_question] <-
+          questions_n_on_q[next_question] + 1 
+        
         scientist_df$question[sampler_ids[i]] <-
-          next_q #move scientist to new question
+          next_question #move scientist to new question
       }
 
       #reset the time until sampling for the subset of players who sampled
@@ -174,13 +173,13 @@ play_complexcomp <-
             dum2 <-
               question_ids[1:largest_q_avail_movers] > ineligible_max
             dum <- dum1 & dum2
-            next_q <- match(TRUE, dum)
+            next_question <- match(TRUE, dum)
             questions_n_on_q[question_of_scoopee] <-
               questions_n_on_q[question_of_scoopee] - 1 #subtract 1 from current 1
-            questions_n_on_q[next_q] <-
-              questions_n_on_q[next_q] + 1 # add 1 to next q
+            questions_n_on_q[next_question] <-
+              questions_n_on_q[next_question] + 1 # add 1 to next q
             scientist_df$question[pos_potent_mover[i]] <-
-              next_q #move scientist to new question
+              next_question #move scientist to new question
             #reset the time until sampling for the subset of players who moved
             tracker_time[pos_potent_mover[i]] <- baseline_time[pos_potent_mover[i]]
           }
@@ -288,4 +287,12 @@ add_payoff_to_that_sampler <- function(scientist_df, sampler_ids, i, payoff) {
   scientist_df$payoff[sampler_ids[i]] <-
     scientist_df$payoff[sampler_ids[i]] + payoff
   return(scientist_df)
+}
+
+get_next_question <- function(questions_n_on_q, largest_q_avail, max_players_per_q, question_ids, max_previously_published_questions) {
+  dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
+  dum2 <- question_ids[1:largest_q_avail] > max_previously_published_questions
+  dum <- dum1 & dum2
+  next_q <- match(TRUE, dum)
+  return(next_q)
 }

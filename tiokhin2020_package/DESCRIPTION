@@ -11,3 +11,5 @@ Encoding: UTF-8
 Imports: RColorBrewer, dplyr, fastmatch, ggplot2, plyr, profvis, pwr, viridis, viridisLite
 LazyData: true
 RoxygenNote: 7.1.0
+Suggests: 
+    testthat (>= 2.1.0)

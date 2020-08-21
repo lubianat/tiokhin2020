@@ -49,11 +49,10 @@ play_complexcomp <-
 
     sample_sizes <- get_sample_sizes(evolution, ss, num_players, min_sample_size, max_sample_size)
 
-        ids_for_scientists <- 1:length(sample_sizes)
+    ids_for_scientists <- 1:length(sample_sizes)
 
-    number_of_questions <-
-      round((lifespan / (startup_cost + 2)) * num_players) + 1000
-
+    number_of_questions <- get_number_of_questions(lifespan, startup_cost, num_players)
+      
     initial_payoffs <- rep(0.0000001, length = length(sample_sizes))
 
     scientist_df <- data.frame(
@@ -243,3 +242,8 @@ get_sample_sizes <- function(evolution, ss, num_players, min_sample_size, max_sa
   }
   return(samplesizes)
 }
+
+get_number_of_questions <- function(lifespan, startup_cost, num_players) {
+  round((lifespan / (startup_cost + 2)) * num_players) + 1000
+}
+

@@ -138,6 +138,17 @@ and re-test and be sure that the results are the same.
 I've made a simple test for only one of the cases of interest. I will make 
 more to be sure that (almost) all the code is covered. 
 
+### Add coverage testing
+Using the R package [covr](https://github.com/r-lib/covr), I set up the
+repository to check how much of the code is being run by tests. 
+
+So far, the testes are covering 99.22% of the code, but eventually they
+will cover everything. 
+
+The tests are not still testing what we want, but they can already see the
+whole code, which is already good
+
+
 ### Actual problems
 
 #### 1 

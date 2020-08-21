@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 # tiokhin2020
 
 <!-- badges: start -->
+[![Travis build status](https://travis-ci.org/lubianat/tiokhin2020.svg?branch=master)](https://travis-ci.org/lubianat/tiokhin2020)
+[![Codecov test coverage](https://codecov.io/gh/lubianat/tiokhin2020/branch/master/graph/badge.svg)](https://codecov.io/gh/lubianat/tiokhin2020?branch=master)
 <!-- badges: end -->
 
 The goal of tiokhin2020 is to be a small package to allow testing of the code underlying 

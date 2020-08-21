@@ -96,24 +96,14 @@ play_complexcomp <-
       powers <- get_t_test_powers(ss_of_samplers, questions_e_size, questions_they_are_working_on)
      
       results_players_got <- check_results_players_got(num_samplers, powers) 
-        
-
+  
       for (i in 1:num_samplers) {
         # find all prior published results (true or false) on the corresponding question,
         num_prior <- length(prev_pub_q[prev_pub_q == questions_they_are_working_on[i]])
 
-        # how novel is the new result
-        novelty_of_res <- (1 / (1 + num_prior)) ^ decay
+        novelty_of_result <- (1 / (1 + num_prior)) ^ decay
 
-        ### Adjust the below payoff functions depending on which one you are interested in ###
-
-        # calculate payoff
-        if (results_players_got[i]) {
-          payoff <- novelty_of_res
-        } else{
-          payoff <- novelty_of_res * b_neg
-        }
-        ### End selection of payoff functions ###
+        payoff <- calculate_payoff(results_players_got, i, novelty_of_result, b_neg) 
 
         #add payoff to data frame for that sampler
         scientist_df$payoff[sampler_ids[i]] <-
@@ -268,3 +258,21 @@ check_results_players_got <- function(num_samplers, powers) {
   runif(num_samplers, 0, 1) < powers
 }
 
+get_t_test_powers <- function(ss_of_samplers, questions_e_size, questions_they_are_working_on) {
+  as.numeric(
+    pwr.t.test(
+      n = ss_of_samplers,
+      d = questions_e_size[questions_they_are_working_on],
+      sig.level = 0.05,
+      type = "two.sample"
+    )[4]$power
+  )
+}
+
+calculate_payoff <- function(results_players_got, i, novelty_of_result, b_neg) {
+  if (results_players_got[i]) {
+    payoff <- novelty_of_result
+  } else{
+    payoff <- novelty_of_result * b_neg
+  }
+}

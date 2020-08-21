@@ -102,7 +102,23 @@ smaller parts of `play_complexcomp`
 
 This will make it way more reproducible, testable and reusable, I hope.
 
+#### Avoid global variables! 
 
+There are places in the code that play_complexcomp uses a variable that is not
+explicitly passed into the function! (See problem 2 below)
+
+This is a problem, because scopes can be mixed, leading to very tricky bugs. 
+It might not be actually causing any problems, but it is dangerous coding. 
+
+It also makes the package not work properly for when evolution = 1. 
+
+
+#### Always use parameter names in large function calls
+
+The call to `play_complexcomp` does not make it explict which parameters are
+which. Take makes it also dangerous coding. It is way too easy to miss the right
+position and change one parameter for another. 
+I will change that once I finish the R package.
 
 
 
@@ -116,4 +132,17 @@ This will make it way more reproducible, testable and reusable, I hope.
  The comment does not match the code. Should it be 0 or  0.0000001?
  I have removed the comment and     payoff_v ---> initial_payoffs
   
+#### 2
+
+`num_players <- players
+ (...) 
+ RR <-play_complexcomp(0,    15000,    NA,       c,         100,       1,     5,        d,     1,   a_prob)`
+ 
+ This is the error code when the play_complexcomp is encapsulated into a package: 
+ 
+ ` Error in runif(num_players, min_sample_size, max_sample_size) : 
+  object 'num_players' not found `
+  
+This is an error that I introduced, but only because the `num_players` variable were 
+not deployed as argument of `play_complexcomp` 
 

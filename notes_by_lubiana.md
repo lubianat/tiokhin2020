@@ -193,3 +193,7 @@ ensure that the results are reproducible.
 
 By the stochastic nature of these functions, the original article is, **stricto sensu**, 
 irreparably irreproducible. 
+
+#### 4 (maybe)
+In  `samplers <-c(scientist_df$sci_id[tracker_time == 0]) #id of scientists that can sample`
+the samplers are NOT changed in every iteration. They are always the same scientists.

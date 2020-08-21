@@ -62,19 +62,19 @@ play_complexcomp <-
     scientist_df <-
       assign_scientists_to_questions(scientist_df, question_ids, max_players_per_q, ids_for_scientists)
     
-
-    questions_e_size <- round(rexp(number_of_questions, exp_shape), 1)
-
-    time_period <- 1
-    baseline_time <- scientist_df$ss * sample_cost + startup_cost
-    tracker_time <- scientist_df$ss * sample_cost + startup_cost
-
     questions_n_on_q <- get_questions_n_on_q(number_of_questions, scientist_df)
+    
+    
+    questions_e_size <- round(rexp(number_of_questions, exp_shape), 1)
     
     #will store unique q_ids for published results
     prev_pub_q <- vector()
 
     results_tracker_old <- 0
+    
+    time_period <- 1
+    baseline_time <- scientist_df$ss * sample_cost + startup_cost
+    tracker_time <- scientist_df$ss * sample_cost + startup_cost
 
     while (time_period < lifespan) {
       time_to_next_event <- min(c(tracker_time, lifespan - time_period))
@@ -85,13 +85,16 @@ play_complexcomp <-
         break
       }
 
-      samplers <-
-        c(scientist_df$sci_id[tracker_time == 0]) #id of scientists that can sample
-      num_samplers <- length(samplers)
+      sampler_ids <- get_sampler_ids(scientist_df)
+        
+      num_samplers <- length(sampler_ids)
       ques <-
-        c(scientist_df$question[samplers]) #question they are working on
-      ss_of_samplers <- scientist_df$ss[samplers]
-
+        c(scientist_df$question[sampler_ids]) #question they are working on
+      ss_of_samplers <- scientist_df$ss[sampler_ids]
+      
+      
+      questions_e_size <- round(rexp(number_of_questions, exp_shape), 1)
+      
       powers <-
         as.numeric(
           pwr.t.test(
@@ -122,8 +125,8 @@ play_complexcomp <-
         ### End selection of payoff functions ###
 
         #add payoff to data frame for that sampler
-        scientist_df$payoff[samplers[i]] <-
-          scientist_df$payoff[samplers[i]] + payoff
+        scientist_df$payoff[sampler_ids[i]] <-
+          scientist_df$payoff[sampler_ids[i]] + payoff
       }
 
       #update vector for previously published questions
@@ -134,7 +137,7 @@ play_complexcomp <-
 
       #update results_m
       results_m[(results_tracker_old + 1):results_tracker_new, ] <-
-        c(ques, samplers, ss_of_samplers, res)
+        c(ques, sampler_ids, ss_of_samplers, res)
 
       #subset of new question space to search
       largest_q_avail <- max(scientist_df$question) + num_samplers
@@ -152,17 +155,17 @@ play_complexcomp <-
           questions_n_on_q[ques[i]] - 1 #subtract 1 from current 1
         questions_n_on_q[next_q] <-
           questions_n_on_q[next_q] + 1 # add 1 to next q
-        scientist_df$question[samplers[i]] <-
+        scientist_df$question[sampler_ids[i]] <-
           next_q #move scientist to new question
       }
 
       #reset the time until sampling for the subset of players who sampled
-      tracker_time[samplers] <- baseline_time[samplers]
+      tracker_time[sampler_ids] <- baseline_time[sampler_ids]
 
       #update positions of scientists who are working on questions where there just was published result
       pos_potent_mover <-
         which(scientist_df$question %fin% ques &
-                !scientist_df$sci_id %fin% samplers)
+                !scientist_df$sci_id %fin% sampler_ids)
       num_potent_movers <- length(pos_potent_mover)
 
       # limit search for new questions to the smaller subset of all q's that could potentially be moved to, for movers
@@ -177,7 +180,7 @@ play_complexcomp <-
           question_of_scoopee <-
             scientist_df$question[pos_potent_mover[i]]
           #id of the scooper
-          scooper_id <- samplers[ques == question_of_scoopee]
+          scooper_id <- sampler_ids[ques == question_of_scoopee]
           #take max of scooper current questions
           ineligible_max <-
             max(scientist_df$question[scientist_df$sci_id %fin% scooper_id])
@@ -261,3 +264,7 @@ get_questions_n_on_q <- function(number_of_questions, scientist_df) {
   sci_per_q[as.integer(names(table_of_questions))] <- as.vector(table_of_questions)
   questions_n_on_q <- sci_per_q
 }
+
+get_sampler_ids <- function(scientist_df) {
+  c(scientist_df$sci_id[tracker_time == 0])}  
+

@@ -95,8 +95,8 @@ play_complexcomp <-
 
       powers <- get_t_test_powers(ss_of_samplers, questions_e_size, questions_they_are_working_on)
      
-      res <-
-        runif(num_samplers, 0, 1) < powers #checks what result those players got
+      results_players_got <- check_results_players_got(num_samplers, powers) 
+        
 
       for (i in 1:num_samplers) {
         # find all prior published results (true or false) on the corresponding question,
@@ -108,7 +108,7 @@ play_complexcomp <-
         ### Adjust the below payoff functions depending on which one you are interested in ###
 
         # calculate payoff
-        if (res[i]) {
+        if (results_players_got[i]) {
           payoff <- novelty_of_res
         } else{
           payoff <- novelty_of_res * b_neg
@@ -128,7 +128,7 @@ play_complexcomp <-
 
       #update results_m
       results_m[(results_tracker_old + 1):results_tracker_new, ] <-
-        c(questions_they_are_working_on, sampler_ids, ss_of_samplers, res)
+        c(questions_they_are_working_on, sampler_ids, ss_of_samplers, results_players_got)
 
       #subset of new question space to search
       largest_q_avail <- max(scientist_df$question) + num_samplers
@@ -264,13 +264,7 @@ get_questions_they_are_working_on <- function(scientist_df, sampler_ids) {
   c(scientist_df$question[sampler_ids])
 }
 
-get_t_test_powers <- function(ss_of_samplers, questions_e_size, questions_they_are_working_on) {
-  as.numeric(
-    pwr.t.test(
-      n = ss_of_samplers,
-      d = questions_e_size[questions_they_are_working_on],
-      sig.level = 0.05,
-      type = "two.sample"
-    )[4]$power
-  )
+check_results_players_got <- function(num_samplers, powers) {
+  runif(num_samplers, 0, 1) < powers
 }
+

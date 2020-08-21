@@ -57,23 +57,20 @@ play_complexcomp <-
     
     results_m <- get_results_matrix(number_of_questions, max_players_per_q)
 
+    question_ids <- seq_len(number_of_questions)
+    
+    scientist_df <-
+      assign_scientists_to_questions(scientist_df, question_ids, max_players_per_q, ids_for_scientists)
+    
 
-    questions_q_id <- seq_len(number_of_questions)
-    questions_n_on_q <- rep(0, number_of_questions)
     questions_e_size <- round(rexp(number_of_questions, exp_shape), 1)
 
     time_period <- 1
     baseline_time <- scientist_df$ss * sample_cost + startup_cost
     tracker_time <- scientist_df$ss * sample_cost + startup_cost
 
-    scientist_df <-
-    assign_scientists_to_questions(scientist_df, questions_q_id, max_players_per_q, ids_for_scientists)
-  
-    sci_per_q <- questions_n_on_q
-    tab <- table(scientist_df$question)
-    sci_per_q[as.integer(names(tab))] <- as.vector(tab)
-    questions_n_on_q <- sci_per_q
-
+    questions_n_on_q <- get_questions_n_on_q(number_of_questions, scientist_df)
+    
     #will store unique q_ids for published results
     prev_pub_q <- vector()
 
@@ -148,7 +145,7 @@ play_complexcomp <-
       #move scientists who published to subsequent questions
       for (i in 1:num_samplers) {
         dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
-        dum2 <- questions_q_id[1:largest_q_avail] > max_prev_pub
+        dum2 <- question_ids[1:largest_q_avail] > max_prev_pub
         dum <- dum1 & dum2
         next_q <- match(TRUE, dum)
         questions_n_on_q[ques[i]] <-
@@ -192,7 +189,7 @@ play_complexcomp <-
             dum1 <-
               questions_n_on_q[1:largest_q_avail_movers] < max_players_per_q
             dum2 <-
-              questions_q_id[1:largest_q_avail_movers] > ineligible_max
+              question_ids[1:largest_q_avail_movers] > ineligible_max
             dum <- dum1 & dum2
             next_q <- match(TRUE, dum)
             questions_n_on_q[question_of_scoopee] <-
@@ -212,7 +209,7 @@ play_complexcomp <-
     }
     results_df <- as.data.frame(results_m[1:results_tracker_old, ])
     results_df$esize <-
-      questions_e_size[match(results_df$q_id, questions_q_id)]
+      questions_e_size[match(results_df$q_id, question_ids)]
     return(list(scientist_df))
   }
 
@@ -255,4 +252,12 @@ get_results_matrix <- function(number_of_questions, max_players_per_q) {
     ss = 0,
     result = 0
   ))
+}
+
+get_questions_n_on_q <- function(number_of_questions, scientist_df) {
+  questions_n_on_q <- rep(0, number_of_questions)
+  sci_per_q <- questions_n_on_q
+  table_of_questions <- table(scientist_df$question)
+  sci_per_q[as.integer(names(table_of_questions))] <- as.vector(table_of_questions)
+  questions_n_on_q <- sci_per_q
 }

@@ -87,7 +87,7 @@ play_complexcomp <-
 
       sampler_ids <- get_sampler_ids(scientist_df, tracker_time) 
 
-      num_samplers <- length(sampler_ids)
+      number_of_samplers <- length(sampler_ids)
       
       questions_they_are_working_on <- get_questions_they_are_working_on(scientist_df, sampler_ids)
 
@@ -95,9 +95,9 @@ play_complexcomp <-
 
       powers <- get_t_test_powers(ss_of_samplers, questions_e_size, questions_they_are_working_on)
      
-      results_players_got <- check_results_players_got(num_samplers, powers) 
+      results_players_got <- check_results_players_got(number_of_samplers, powers) 
   
-      for (i in 1:num_samplers) {
+      for (i in 1:number_of_samplers) {
 
         num_prior <- count_all_prior_published_results_for_questions(previously_published_questions, questions_they_are_working_on, i) 
 
@@ -110,24 +110,22 @@ play_complexcomp <-
 
       }
 
-      #update vector for previously published questions
       previously_published_questions <- c(previously_published_questions, questions_they_are_working_on)
 
-      #updated results tracker
-      results_tracker_new <- results_tracker_old + num_samplers
+      results_tracker_new <- results_tracker_old + number_of_samplers
 
       #update results_m
       results_m[(results_tracker_old + 1):results_tracker_new, ] <-
         c(questions_they_are_working_on, sampler_ids, ss_of_samplers, results_players_got)
 
       #subset of new question space to search
-      largest_q_avail <- max(scientist_df$question) + num_samplers
+      largest_q_avail <- max(scientist_df$question) + number_of_samplers
 
       #largest question in previously pub questions
       max_prev_pub <- max(previously_published_questions)
 
       #move scientists who published to subsequent questions
-      for (i in 1:num_samplers) {
+      for (i in 1:number_of_samplers) {
         dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
         dum2 <- question_ids[1:largest_q_avail] > max_prev_pub
         dum <- dum1 & dum2

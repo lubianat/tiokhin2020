@@ -47,34 +47,45 @@ play_complexcomp <-
            min_sample_size,
            max_sample_size) {
    
-    sample_sizes <-
-      get_sample_sizes(evolution, ss, num_players, min_sample_size, max_sample_size)
-    ids_for_scientists <- 1:length(sample_sizes)
-    initial_payoffs <- rep(0.0000001, length = length(sample_sizes))
-    scientist_df <-
-      get_scientists_data_frame(ids_for_scientists,
-                                sample_sizes,
-                                abandon_prob,
-                                initial_payoffs,
-                                num_players)
+    sample_sizes <- get_sample_sizes(evolution,
+                                     ss, 
+                                     num_players,
+                                     min_sample_size, 
+                                     max_sample_size)
+    
+    ids_for_scientists <- get_ids_for_scientists(sample_sizes) 
+    initial_payoffs <- get_initial_payoffs(sample_sizes)
+
+    scientist_df <- get_scientists_data_frame(ids_for_scientists,
+                                              sample_sizes,
+                                              abandon_prob,
+                                              initial_payoffs,
+                                              num_players)
    
-     number_of_questions <-
-      get_number_of_questions(lifespan, startup_cost, num_players)
-    question_ids <- seq_len(number_of_questions)
+    number_of_questions <- get_number_of_questions(lifespan, 
+                                                    startup_cost, 
+                                                    num_players)
+
+    question_ids <- get_question_ids(number_of_questions)
+
+    
     scientist_df <-
       assign_scientists_to_questions(scientist_df,
                                      question_ids,
                                      max_players_per_q,
                                      ids_for_scientists)
     
-    questions_e_size <-
-      round(rexp(number_of_questions, exp_shape), 1)
-    results_matrix <-
-      get_results_matrix(number_of_questions, max_players_per_q)
+    questions_e_size <- get_questions_e_size(number_of_questions,
+                                             exp_shape)
+
+    results_matrix <- get_results_matrix(number_of_questions,
+                                         max_players_per_q)
     
     time_period <- 1
-    baseline_time <- scientist_df$ss * sample_cost + startup_cost
-    tracker_time <- scientist_df$ss * sample_cost + startup_cost
+    
+    sample_sizes <- scientist_df$ss
+    baseline_time <- sample_sizes * sample_cost + startup_cost
+    tracker_time <- baseline_time
     previously_published_questions <- vector()
     results_tracker_old <- 0
     
@@ -242,10 +253,22 @@ get_sample_sizes <-
     return(samplesizes)
   }
 
+get_ids_for_scientists <- function(sample_sizes) {
+  1:length(sample_sizes)
+}
+
+get_initial_payoffs <- function(sample_sizes) {
+  rep(0.0000001, length = length(sample_sizes))
+}
+
 get_number_of_questions <-
   function(lifespan, startup_cost, num_players) {
     round((lifespan / (startup_cost + 2)) * num_players) + 1000
   }
+
+get_question_ids <- function(number_of_questions) {
+  seq_len(number_of_questions)
+}
 
 assign_scientists_to_questions <-
   function(scientist_df,
@@ -273,6 +296,10 @@ get_scientists_data_frame <-
       num_players = num_players
     )
   }
+
+get_questions_e_size <- function(number_of_questions, exp_shape) {
+  round(rexp(number_of_questions, exp_shape), 1)
+}
 
 get_results_matrix <-
   function(number_of_questions, max_players_per_q) {

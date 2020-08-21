@@ -136,9 +136,11 @@ We should always try to come up with meaningful names.
 
 #### I cannot understand what question_n_on_q is 
 
-I have no idea what the variable question_n_on_q. I need to understand
+I have no idea what the variable `question_n_on_q`. I need to understand
 all the variables to be sure that the code does what it is supposed to 
 do. 
+
+The same goes for `questions_e_size`
 
 
 # Step 1: 

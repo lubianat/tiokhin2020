@@ -114,9 +114,12 @@ play_complexcomp <-
 
       results_tracker_new <- results_tracker_old + number_of_samplers
 
-      #update results_m
-      results_matrix[(results_tracker_old + 1):results_tracker_new, ] <-
-        c(questions_they_are_working_on, sampler_ids, ss_of_samplers, results_players_got)
+
+      index_to_update <- (results_tracker_old + 1):results_tracker_new
+      set_of_results <- c(questions_they_are_working_on, sampler_ids, ss_of_samplers, results_players_got)
+      
+      results_matrix[index_to_update, ] <- set_of_results
+        
 
       #subset of new question space to search
       largest_q_avail <- max(scientist_df$question) + number_of_samplers

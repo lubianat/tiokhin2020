@@ -120,17 +120,15 @@ play_complexcomp <-
       
       results_matrix[index_to_update, ] <- set_of_results
         
-
       #subset of new question space to search
       largest_q_avail <- max(scientist_df$question) + number_of_samplers
 
-      #largest question in previously pub questions
-      max_prev_pub <- max(previously_published_questions)
+      max_previously_published_questions <- max(previously_published_questions)
 
       #move scientists who published to subsequent questions
       for (i in 1:number_of_samplers) {
         dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
-        dum2 <- question_ids[1:largest_q_avail] > max_prev_pub
+        dum2 <- question_ids[1:largest_q_avail] > max_previously_published_questions
         dum <- dum1 & dum2
         next_q <- match(TRUE, dum)
         questions_n_on_q[questions_they_are_working_on[i]] <-

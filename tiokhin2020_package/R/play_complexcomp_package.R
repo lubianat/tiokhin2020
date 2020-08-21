@@ -88,20 +88,13 @@ play_complexcomp <-
       sampler_ids <- get_sampler_ids(scientist_df, tracker_time) 
 
       num_samplers <- length(sampler_ids)
+      
       questions_they_are_working_on <- get_questions_they_are_working_on(scientist_df, sampler_ids)
 
-      
       ss_of_samplers <- scientist_df$ss[sampler_ids]
 
-      powers <-
-        as.numeric(
-          pwr.t.test(
-            n = ss_of_samplers,
-            d = questions_e_size[questions_they_are_working_on],
-            sig.level = 0.05,
-            type = "two.sample"
-          )[4]$power
-        )
+      powers <- get_t_test_powers(ss_of_samplers, questions_e_size, questions_they_are_working_on)
+     
       res <-
         runif(num_samplers, 0, 1) < powers #checks what result those players got
 
@@ -269,4 +262,15 @@ get_sampler_ids <- function(scientist_df, tracker_time) {
 
 get_questions_they_are_working_on <- function(scientist_df, sampler_ids) {
   c(scientist_df$question[sampler_ids])
+}
+
+get_t_test_powers <- function(ss_of_samplers, questions_e_size, questions_they_are_working_on) {
+  as.numeric(
+    pwr.t.test(
+      n = ss_of_samplers,
+      d = questions_e_size[questions_they_are_working_on],
+      sig.level = 0.05,
+      type = "two.sample"
+    )[4]$power
+  )
 }

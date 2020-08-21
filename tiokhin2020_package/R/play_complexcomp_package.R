@@ -72,7 +72,7 @@ play_complexcomp <-
     questions_n_on_q <- get_questions_n_on_q(number_of_questions, scientist_df)
     
     #will store unique q_ids for published results
-    prev_pub_q <- vector()
+    previously_published_questions <- vector()
 
     results_tracker_old <- 0
 
@@ -99,7 +99,7 @@ play_complexcomp <-
   
       for (i in 1:num_samplers) {
 
-        num_prior <- count_all_prior_published_results_for_questions(prev_pub_q, questions_they_are_working_on, i) 
+        num_prior <- count_all_prior_published_results_for_questions(previously_published_questions, questions_they_are_working_on, i) 
 
         novelty_of_result <- calculate_novelty(num_prior, decay)
 
@@ -111,7 +111,7 @@ play_complexcomp <-
       }
 
       #update vector for previously published questions
-      prev_pub_q <- c(prev_pub_q, questions_they_are_working_on)
+      previously_published_questions <- c(previously_published_questions, questions_they_are_working_on)
 
       #updated results tracker
       results_tracker_new <- results_tracker_old + num_samplers
@@ -124,7 +124,7 @@ play_complexcomp <-
       largest_q_avail <- max(scientist_df$question) + num_samplers
 
       #largest question in previously pub questions
-      max_prev_pub <- max(prev_pub_q)
+      max_prev_pub <- max(previously_published_questions)
 
       #move scientists who published to subsequent questions
       for (i in 1:num_samplers) {

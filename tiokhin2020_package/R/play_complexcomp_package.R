@@ -98,16 +98,16 @@ play_complexcomp <-
       results_players_got <- check_results_players_got(num_samplers, powers) 
   
       for (i in 1:num_samplers) {
-        # find all prior published results (true or false) on the corresponding question,
-        num_prior <- length(prev_pub_q[prev_pub_q == questions_they_are_working_on[i]])
 
-        novelty_of_result <- (1 / (1 + num_prior)) ^ decay
+        num_prior <- count_all_prior_published_results_for_questions(prev_pub_q, questions_they_are_working_on, i) 
+
+        novelty_of_result <- calculate_novelty(num_prior, decay)
 
         payoff <- calculate_payoff(results_players_got, i, novelty_of_result, b_neg) 
 
-        #add payoff to data frame for that sampler
-        scientist_df$payoff[sampler_ids[i]] <-
-          scientist_df$payoff[sampler_ids[i]] + payoff
+        scientist_df <- add_payoff_to_that_sampler(scientist_df, sampler_ids, i, payoff)
+
+
       }
 
       #update vector for previously published questions
@@ -275,4 +275,18 @@ calculate_payoff <- function(results_players_got, i, novelty_of_result, b_neg) {
   } else{
     payoff <- novelty_of_result * b_neg
   }
+}
+
+count_all_prior_published_results_for_questions <- function(prev_pub_q, questions_they_are_working_on, i) {
+  length(prev_pub_q[prev_pub_q == questions_they_are_working_on[i]])
+}
+
+calculate_novelty <- function(num_prior, decay) {
+  (1 / (1 + num_prior)) ^ decay
+}
+
+add_payoff_to_that_sampler <- function(scientist_df, sampler_ids, i, payoff) {
+  scientist_df$payoff[sampler_ids[i]] <-
+    scientist_df$payoff[sampler_ids[i]] + payoff
+  return(scientist_df)
 }

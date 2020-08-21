@@ -47,23 +47,18 @@ play_complexcomp <-
            min_sample_size,
            max_sample_size) {
 
-    if (evolution == 1) {
-      samplesizes <- ss
-    } else {
-      samplesizes <-
-        round(runif(num_players, min_sample_size, max_sample_size))
-    }
+    sample_sizes <- get_sample_sizes(evolution, ss, num_players, min_sample_size, max_sample_size)
 
-    ids_for_scientists <- 1:length(samplesizes)
+        ids_for_scientists <- 1:length(sample_sizes)
 
     number_of_questions <-
       round((lifespan / (startup_cost + 2)) * num_players) + 1000
 
-    initial_payoffs <- rep(0.0000001, length = length(samplesizes))
+    initial_payoffs <- rep(0.0000001, length = length(sample_sizes))
 
     scientist_df <- data.frame(
       sci_id = ids_for_scientists,
-      ss = samplesizes,
+      ss = sample_sizes,
       question = 0,
       abandon_prob = abandon_prob,
       payoff = initial_payoffs,
@@ -237,3 +232,14 @@ play_complexcomp <-
       questions_e_size[match(results_df$q_id, questions_q_id)]
     return(list(scientist_df))
   }
+
+
+get_sample_sizes <- function(evolution, ss, num_players, min_sample_size, max_sample_size) {
+  if (evolution == 1) {
+    samplesizes <- ss
+  } else {
+    samplesizes <-
+      round(runif(num_players, min_sample_size, max_sample_size))
+  }
+  return(samplesizes)
+}

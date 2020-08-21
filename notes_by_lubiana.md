@@ -148,6 +148,12 @@ will cover everything.
 The tests are not still testing what we want, but they can already see the
 whole code, which is already good
 
+### Extract and test
+
+The part now is to extract the individual bits of the `play_complexcomp` function and test them individually, one by one. 
+
+
+
 
 ### Actual problems
 
@@ -173,3 +179,11 @@ whole code, which is already good
 This is an error that I introduced, but only because the `num_players` variable were 
 not deployed as argument of `play_complexcomp` 
 
+#### 3 
+
+Some functions have "randomness" built in. This is interesting, but for sheer computational 
+reproducibility, it is problematic. It is important to use "set.seed" in analysis code to 
+ensure that the results are reproducible. 
+
+By the stochastic nature of these functions, the original article is, **stricto sensu**, 
+irreparably irreproducible. 

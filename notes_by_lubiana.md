@@ -120,7 +120,23 @@ which. Take makes it also dangerous coding. It is way too easy to miss the right
 position and change one parameter for another. 
 I will change that once I finish the R package.
 
+# Step 1: 
 
+## Add tests for the functions
+
+I will add tests for everything, so we know that the code does what
+you expect it does. That is the industry standard: if it is not tested,
+you can't know if it works the way it should. 
+
+Tests are added to the package with the help of another package called 
+testthat.
+
+### Add integration test
+The first thing is to add a test that runs the whole script so I can modify
+and re-test and be sure that the results are the same. 
+
+I've made a simple test for only one of the cases of interest. I will make 
+more to be sure that (almost) all the code is covered. 
 
 ### Actual problems
 

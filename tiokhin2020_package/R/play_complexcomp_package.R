@@ -25,6 +25,10 @@ NULL
 #' @param decay decay
 #' @param b_neg b_neg
 #' @param abandon_prob abandon_prob
+#' @param num_players num_players
+#' @param min_sample_size min_sample_size
+#' @param max_sample_size max_sample_size
+#' @import pwr
 #' @return
 #' @export
 #'
@@ -38,7 +42,10 @@ play_complexcomp <-
            exp_shape,
            decay,
            b_neg,
-           abandon_prob) {
+           abandon_prob,
+           num_players,
+           min_sample_size,
+           max_sample_size) {
 
     if (evolution == 1) {
       samplesizes <- ss

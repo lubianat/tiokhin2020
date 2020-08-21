@@ -14,7 +14,10 @@ play_complexcomp(
   exp_shape,
   decay,
   b_neg,
-  abandon_prob
+  abandon_prob,
+  num_players,
+  min_sample_size,
+  max_sample_size
 )
 }
 \arguments{
@@ -37,6 +40,12 @@ play_complexcomp(
 \item{b_neg}{b_neg}
 
 \item{abandon_prob}{abandon_prob}
+
+\item{num_players}{num_players}
+
+\item{min_sample_size}{min_sample_size}
+
+\item{max_sample_size}{max_sample_size}
 }
 \value{
 

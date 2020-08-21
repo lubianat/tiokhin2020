@@ -120,6 +120,12 @@ which. Take makes it also dangerous coding. It is way too easy to miss the right
 position and change one parameter for another. 
 I will change that once I finish the R package.
 
+
+#### Variables are defined far from where they are used
+
+Some variables are defined in the beginning, but only used much later. This makes it 
+very hard to track what is doing what. 
+
 # Step 1: 
 
 ## Add tests for the functions

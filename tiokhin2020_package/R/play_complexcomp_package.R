@@ -81,10 +81,9 @@ play_complexcomp <-
     baseline_time <- scientist_df$ss * sample_cost + startup_cost
     tracker_time <- scientist_df$ss * sample_cost + startup_cost
 
-    #assign scientists to questions and update questions_df with scientists
-    scientist_df$question[ids_for_scientists] <-
-      rep(questions_q_id, each = max_players_per_q)[ids_for_scientists]
-
+  scientist_df$question[ids_for_scientists] <-
+    assign_scientists_to_questions(questions_q_id, max_players_per_q, ids_for_scientists)
+  
     sci_per_q <- questions_n_on_q
     tab <- table(scientist_df$question)
     sci_per_q[as.integer(names(tab))] <- as.vector(tab)
@@ -245,5 +244,9 @@ get_sample_sizes <- function(evolution, ss, num_players, min_sample_size, max_sa
 
 get_number_of_questions <- function(lifespan, startup_cost, num_players) {
   round((lifespan / (startup_cost + 2)) * num_players) + 1000
+}
+
+assign_scientists_to_questions <- function(questions_q_id, max_players_per_q, ids_for_scientists) {
+  rep(questions_q_id, each = max_players_per_q)[ids_for_scientists]
 }
 

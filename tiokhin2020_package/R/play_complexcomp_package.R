@@ -48,11 +48,7 @@ play_complexcomp <-
            max_sample_size) {
 
     sample_sizes <- get_sample_sizes(evolution, ss, num_players, min_sample_size, max_sample_size)
-
     ids_for_scientists <- 1:length(sample_sizes)
-
-    number_of_questions <- get_number_of_questions(lifespan, startup_cost, num_players)
-      
     initial_payoffs <- rep(0.0000001, length = length(sample_sizes))
 
     scientist_df <- data.frame(
@@ -64,7 +60,9 @@ play_complexcomp <-
       scooped = 0,
       num_players = num_players
     )
-
+    
+    number_of_questions <- get_number_of_questions(lifespan, startup_cost, num_players)
+    
     results_m <-
       as.matrix(data.frame(
         q_id = rep(0, number_of_questions * max_players_per_q),
@@ -81,8 +79,8 @@ play_complexcomp <-
     baseline_time <- scientist_df$ss * sample_cost + startup_cost
     tracker_time <- scientist_df$ss * sample_cost + startup_cost
 
-  scientist_df$question[ids_for_scientists] <-
-    assign_scientists_to_questions(questions_q_id, max_players_per_q, ids_for_scientists)
+    scientist_df <-
+    assign_scientists_to_questions(scientist_df, questions_q_id, max_players_per_q, ids_for_scientists)
   
     sci_per_q <- questions_n_on_q
     tab <- table(scientist_df$question)
@@ -246,7 +244,8 @@ get_number_of_questions <- function(lifespan, startup_cost, num_players) {
   round((lifespan / (startup_cost + 2)) * num_players) + 1000
 }
 
-assign_scientists_to_questions <- function(questions_q_id, max_players_per_q, ids_for_scientists) {
-  rep(questions_q_id, each = max_players_per_q)[ids_for_scientists]
+assign_scientists_to_questions <- function(scientist_df, questions_q_id, max_players_per_q, ids_for_scientists) {
+  scientist_df$question[ids_for_scientists] <- rep(questions_q_id, each = max_players_per_q)[ids_for_scientists]
+  return(scientist_df)
 }
 

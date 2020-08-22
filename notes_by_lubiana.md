@@ -227,4 +227,10 @@ ensure that the results are reproducible.
 By the stochastic nature of these functions, the original article is, **stricto sensu**, 
 irreparably irreproducible. 
 
+# Questions 
+
+
+#### 1 
+
+Are all scientists really supposed to be assigned to the same question at moment 0? 
 

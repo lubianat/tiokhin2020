@@ -123,7 +123,7 @@ play_complexcomp <-
           calculate_payoff(results_scientists_got, i, novelty_of_result, b_neg)
         
         scientist_df <-
-          add_payoff_to_that_sampler(scientist_df, testers_ids, i, payoff)
+          add_payoff_to_that_tester(scientist_df, testers_ids, i, payoff)
       }
       
       previously_published_questions <-
@@ -366,7 +366,7 @@ calculate_novelty <- function(num_prior, decay) {
   (1 / (1 + num_prior)) ^ decay
 }
 
-add_payoff_to_that_sampler <-
+add_payoff_to_that_tester <-
   function(scientist_df, sampler_ids, i, payoff) {
     scientist_df$payoff[sampler_ids[i]] <-
       scientist_df$payoff[sampler_ids[i]] + payoff

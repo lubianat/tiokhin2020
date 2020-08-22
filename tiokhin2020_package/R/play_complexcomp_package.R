@@ -102,6 +102,7 @@ play_complexcomp <-
       
      questions_they_are_working_on <-
         get_questions_they_are_working_on(scientist_df, sampler_ids)
+     
       ss_of_samplers <- scientist_df$ss[sampler_ids]
       
       powers <-

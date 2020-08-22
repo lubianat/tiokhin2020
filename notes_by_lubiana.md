@@ -234,3 +234,8 @@ irreparably irreproducible.
 
 Are all scientists really supposed to be assigned to the same question at moment 0? 
 
+(I can answer myself: that is regulated by the `max_scientists_per_q` parameter)
+
+#### 2
+
+Does everyone get a payoff regardless of a true or false result? 

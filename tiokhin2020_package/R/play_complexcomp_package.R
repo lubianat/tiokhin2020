@@ -177,11 +177,8 @@ play_complexcomp <-
       time_cost_for_each_question[sampler_ids] <- time_cost_for_each_question_at_baseline[sampler_ids]
       
       #update positions of scientists who are working on questions where there just was published result
-      pos_potent_mover <-
-        which(
-          scientist_df$question %fin% questions_they_are_working_on &
-            !scientist_df$sci_id %fin% sampler_ids
-        )
+      pos_potent_mover <- get_potent_mover(scientist_df, questions_they_are_working_on, sampler_ids)
+
       num_potent_movers <- length(pos_potent_mover)
       
       # limit search for new questions to the smaller subset of all q's that could potentially be moved to, for movers
@@ -229,6 +226,7 @@ play_complexcomp <-
       results_tracker_old <- results_tracker_new
       
     }
+    
     results_df <-
       as.data.frame(results_matrix[1:results_tracker_old,])
     results_df$esize <-
@@ -390,3 +388,11 @@ get_next_question <-
     next_q <- match(TRUE, dum)
     return(next_q)
   }
+
+
+get_potent_mover <- function(scientist_df, questions_they_are_working_on, sampler_ids) {
+  which(
+    scientist_df$question %fin% questions_they_are_working_on &
+      !scientist_df$sci_id %fin% sampler_ids
+  )
+}

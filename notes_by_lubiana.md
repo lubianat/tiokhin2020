@@ -150,6 +150,15 @@ rather challenging to understand that both are actually the same.
 
 I have changed the word "players" for the word "scientists" everywhere
 
+# Use (very) different names for different things
+
+`sampler` was being used to refer to scientists that finished working
+on a research question. It was not clear to me what sampler was, as it
+kind of sintactically mixed with "sample size."
+
+I've changed `samplers` to `testers`.
+
+
 # Step 1: 
 
 ## Add tests for the functions

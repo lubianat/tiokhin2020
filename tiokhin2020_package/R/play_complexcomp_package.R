@@ -97,23 +97,23 @@ play_complexcomp <-
         break
       }
       
-      sampler_ids <- get_sampler_ids(scientist_df, time_cost_for_each_question)
-      number_of_samplers <- length(sampler_ids)
+      testers_ids <- get_tester_ids(scientist_df, time_cost_for_each_question)
+      number_of_testers <- length(testers_ids)
       
      questions_they_are_working_on <-
-        get_questions_they_are_working_on(scientist_df, sampler_ids)
+        get_questions_they_are_working_on(scientist_df, testers_ids)
      
-      ss_of_samplers <- scientist_df$ss[sampler_ids]
+      sample_size_of_testers <- scientist_df$ss[testers_ids]
       
       powers <-
-        get_t_test_powers(ss_of_samplers,
+        get_t_test_powers(sample_size_of_testers,
                           questions_e_size,
                           questions_they_are_working_on)
       
       results_scientists_got <-
-        check_results_scientists_got(number_of_samplers, powers)
+        check_results_scientists_got(number_of_testers, powers)
       
-      for (i in 1:number_of_samplers) {
+      for (i in 1:number_of_testers) {
         num_prior <-
           count_all_prior_published_results_for_questions(previously_published_questions,
                                                           questions_they_are_working_on,
@@ -123,7 +123,7 @@ play_complexcomp <-
           calculate_payoff(results_scientists_got, i, novelty_of_result, b_neg)
         
         scientist_df <-
-          add_payoff_to_that_sampler(scientist_df, sampler_ids, i, payoff)
+          add_payoff_to_that_sampler(scientist_df, testers_ids, i, payoff)
       }
       
       previously_published_questions <-
@@ -131,7 +131,7 @@ play_complexcomp <-
           questions_they_are_working_on)
       
       results_tracker_new <-
-        results_tracker_old + number_of_samplers
+        results_tracker_old + number_of_testers
       
       
       index_to_update <-
@@ -139,15 +139,15 @@ play_complexcomp <-
       set_of_results <-
         c(
           questions_they_are_working_on,
-          sampler_ids,
-          ss_of_samplers,
+          testers_ids,
+          sample_size_of_testers,
           results_scientists_got
         )
       results_matrix[index_to_update,] <- set_of_results
       
       #subset of new question space to search
       largest_question_available <-
-        max(scientist_df$question) + number_of_samplers
+        max(scientist_df$question) + number_of_testers
       
       max_previously_published_questions <-
         max(previously_published_questions)
@@ -156,7 +156,7 @@ play_complexcomp <-
       questions_n_on_q <-
         get_questions_n_on_q(number_of_questions, scientist_df)
       
-      for (i in 1:number_of_samplers) {
+      for (i in 1:number_of_testers) {
         next_question <- get_next_question(
           questions_n_on_q,
           largest_question_available,
@@ -171,15 +171,15 @@ play_complexcomp <-
         questions_n_on_q[next_question] <-
           questions_n_on_q[next_question] + 1
         
-        scientist_df$question[sampler_ids[i]] <-
+        scientist_df$question[testers_ids[i]] <-
           next_question #move scientist to new question
       }
       
       #reset the time until sampling for the subset of scientists who sampled
-      time_cost_for_each_question[sampler_ids] <- time_cost_for_each_question_at_baseline[sampler_ids]
+      time_cost_for_each_question[testers_ids] <- time_cost_for_each_question_at_baseline[testers_ids]
       
       #update positions of scientists who are working on questions where there just was published result
-      pos_potent_mover <- get_potent_mover(scientist_df, questions_they_are_working_on, sampler_ids)
+      pos_potent_mover <- get_potent_mover(scientist_df, questions_they_are_working_on, testers_ids)
       num_potent_movers <- length(pos_potent_mover)
       
       # limit search for new questions to the smaller subset of all q's that could potentially be moved to, for movers
@@ -193,7 +193,7 @@ play_complexcomp <-
             scientist_df$question[pos_potent_mover[i]]
           #id of the scooper
           scooper_id <-
-            sampler_ids[questions_they_are_working_on == question_of_scoopee]
+            testers_ids[questions_they_are_working_on == question_of_scoopee]
           #take max of scooper current questions
           ineligible_max <-
             max(scientist_df$question[scientist_df$sci_id %fin% scooper_id])
@@ -316,7 +316,7 @@ get_questions_n_on_q <-
     questions_n_on_q <- sci_per_q
   }
 
-get_sampler_ids <- function(scientist_df, tracker_time) {
+get_tester_ids <- function(scientist_df, tracker_time) {
   c(scientist_df$sci_id[tracker_time == 0])
 }
 
@@ -325,17 +325,17 @@ get_questions_they_are_working_on <-
     c(scientist_df$question[sampler_ids])
   }
 
-check_results_scientists_got <- function(num_samplers, powers) {
-  runif(num_samplers, 0, 1) < powers
+check_results_scientists_got <- function(num_testers, powers) {
+  runif(num_testers, 0, 1) < powers
 }
 
 get_t_test_powers <-
-  function(ss_of_samplers,
+  function(ss_of_testers,
            questions_e_size,
            questions_they_are_working_on) {
     as.numeric(
       pwr.t.test(
-        n = ss_of_samplers,
+        n = ss_of_testers,
         d = questions_e_size[questions_they_are_working_on],
         sig.level = 0.05,
         type = "two.sample"

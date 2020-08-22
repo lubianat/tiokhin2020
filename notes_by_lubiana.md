@@ -142,6 +142,10 @@ do.
 
 The same goes for `questions_e_size`
 
+Later I found out that `question_n_on_q` is something like a vector of
+how many scientists are working each question. I've changed its name for
+`scientists_per_question`.
+
 # Repeat the same name for the same things
 
 The players/scientists are refered to sometimes as "players" and 
@@ -238,4 +242,9 @@ Are all scientists really supposed to be assigned to the same question at moment
 
 #### 2
 
-Does everyone get a payoff regardless of a true or false result? 
+Does everyone really get a payoff regardless of a true or false result? 
+
+#### 3
+
+Are all scientists moved to the SAME second question?
+

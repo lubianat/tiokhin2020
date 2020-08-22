@@ -145,31 +145,31 @@ play_complexcomp <-
         )
       results_matrix[index_to_update,] <- set_of_results
       
-      #subset of new question space to search
+
       largest_question_available <-
         max(scientist_df$question) + number_of_testers
-      
-      max_previously_published_questions <-
+  
+      max_previously_published_question <-
         max(previously_published_questions)
       
-      #move scientists who published to subsequent questions
-      questions_n_on_q <-
-        get_questions_n_on_q(number_of_questions, scientist_df)
+      scientists_per_question <-
+        get_scientists_per_question(number_of_questions, scientist_df)
       
       for (i in 1:number_of_testers) {
         next_question <- get_next_question(
-          questions_n_on_q,
+          scientists_per_question,
           largest_question_available,
           max_scientists_per_q,
           ids_for_questions,
-          max_previously_published_questions
+          max_previously_published_question
         )
         
-        questions_n_on_q[questions_they_are_working_on[i]] <-
-          questions_n_on_q[questions_they_are_working_on[i]] - 1
         
-        questions_n_on_q[next_question] <-
-          questions_n_on_q[next_question] + 1
+        scientists_per_question[questions_they_are_working_on[i]] <-
+          scientists_per_question[questions_they_are_working_on[i]] - 1
+        
+        scientists_per_question[next_question] <-
+          scientists_per_question[next_question] + 1
         
         scientist_df$question[testers_ids[i]] <-
           next_question #move scientist to new question
@@ -203,15 +203,15 @@ play_complexcomp <-
           
           if (any(runif(n_new, 0, 1) < scientist_df$abandon_prob[pos_potent_mover[i]])) {
             dum1 <-
-              questions_n_on_q[1:largest_q_avail_movers] < max_scientists_per_q
+              scientists_per_question[1:largest_q_avail_movers] < max_scientists_per_q
             dum2 <-
               ids_for_questions[1:largest_q_avail_movers] > ineligible_max
             dum <- dum1 & dum2
             next_question <- match(TRUE, dum)
-            questions_n_on_q[question_of_scoopee] <-
-              questions_n_on_q[question_of_scoopee] - 1 #subtract 1 from current 1
-            questions_n_on_q[next_question] <-
-              questions_n_on_q[next_question] + 1 # add 1 to next q
+            scientists_per_question[question_of_scoopee] <-
+              scientists_per_question[question_of_scoopee] - 1 #subtract 1 from current 1
+            scientists_per_question[next_question] <-
+              scientists_per_question[next_question] + 1 # add 1 to next q
             scientist_df$question[pos_potent_mover[i]] <-
               next_question #move scientist to new question
             #reset the time until sampling for the subset of scientists who moved
@@ -306,7 +306,7 @@ get_results_matrix <-
     ))
   }
 
-get_questions_n_on_q <-
+get_scientists_per_question <-
   function(number_of_questions, scientist_df) {
     questions_n_on_q <- rep(0, number_of_questions)
     sci_per_q <- questions_n_on_q

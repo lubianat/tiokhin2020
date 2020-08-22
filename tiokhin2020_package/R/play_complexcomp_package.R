@@ -66,12 +66,12 @@ play_complexcomp <-
                                                     startup_cost, 
                                                     num_players)
 
-    question_ids <- get_question_ids(number_of_questions)
+    ids_for_questions <- get_question_ids(number_of_questions)
 
     
     scientist_df <-
       assign_scientists_to_questions(scientist_df,
-                                     question_ids,
+                                     ids_for_questions,
                                      max_players_per_q,
                                      ids_for_scientists)
     
@@ -100,7 +100,7 @@ play_complexcomp <-
       sampler_ids <- get_sampler_ids(scientist_df, time_cost_for_each_question)
       number_of_samplers <- length(sampler_ids)
       
-      questions_they_are_working_on <-
+     questions_they_are_working_on <-
         get_questions_they_are_working_on(scientist_df, sampler_ids)
       ss_of_samplers <- scientist_df$ss[sampler_ids]
       
@@ -109,7 +109,8 @@ play_complexcomp <-
                           questions_e_size,
                           questions_they_are_working_on)
       results_players_got <-
-        check_results_players_got(number_of_samplers, powers)
+      
+          check_results_players_got(number_of_samplers, powers)
       
       for (i in 1:number_of_samplers) {
         num_prior <-
@@ -159,7 +160,7 @@ play_complexcomp <-
           questions_n_on_q,
           largest_question_available,
           max_players_per_q,
-          question_ids,
+          ids_for_questions,
           max_previously_published_questions
         )
         
@@ -178,7 +179,6 @@ play_complexcomp <-
       
       #update positions of scientists who are working on questions where there just was published result
       pos_potent_mover <- get_potent_mover(scientist_df, questions_they_are_working_on, sampler_ids)
-
       num_potent_movers <- length(pos_potent_mover)
       
       # limit search for new questions to the smaller subset of all q's that could potentially be moved to, for movers
@@ -186,9 +186,6 @@ play_complexcomp <-
         largest_question_available + num_potent_movers
       
       if (num_potent_movers > 0) {
-        #for each scientist, check the number of new results for their question. They then move to next question
-        #probabalistically. The larger the number of new results, the higher the probability that they move.
-        
         for (i in 1:num_potent_movers) {
           #questions that the scooped scientist is working on
           question_of_scoopee <-
@@ -207,7 +204,7 @@ play_complexcomp <-
             dum1 <-
               questions_n_on_q[1:largest_q_avail_movers] < max_players_per_q
             dum2 <-
-              question_ids[1:largest_q_avail_movers] > ineligible_max
+              ids_for_questions[1:largest_q_avail_movers] > ineligible_max
             dum <- dum1 & dum2
             next_question <- match(TRUE, dum)
             questions_n_on_q[question_of_scoopee] <-
@@ -230,7 +227,7 @@ play_complexcomp <-
     results_df <-
       as.data.frame(results_matrix[1:results_tracker_old,])
     results_df$esize <-
-      questions_e_size[match(results_df$q_id, question_ids)]
+      questions_e_size[match(results_df$q_id, ids_for_questions)]
     return(list(scientist_df))
   }
 

@@ -175,9 +175,9 @@ play_complexcomp <-
           next_question #move scientist to new question
       }
       
-      #reset the time until sampling for the subset of scientists who sampled
-      time_cost_for_each_question[testers_ids] <- time_cost_for_each_question_at_baseline[testers_ids]
       
+      time_cost_for_each_question <- reset_time_cost_for_testers(time_cost_for_each_question, testers_ids, time_cost_for_each_question_at_baseline) 
+
       #update positions of scientists who are working on questions where there just was published result
       pos_potent_mover <- get_potent_mover(scientist_df, questions_they_are_working_on, testers_ids)
       num_potent_movers <- length(pos_potent_mover)
@@ -394,3 +394,8 @@ get_potent_mover <- function(scientist_df, questions_they_are_working_on, sample
       !scientist_df$sci_id %fin% sampler_ids
   )
 }
+
+reset_time_cost_for_testers <- function(time_cost_for_each_question, testers_ids, time_cost_for_each_question_at_baseline) {
+  time_cost_for_each_question[testers_ids] <- time_cost_for_each_question_at_baseline[testers_ids]
+  time_cost_for_each_question
+  }

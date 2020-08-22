@@ -8,14 +8,14 @@ play_complexcomp(
   evolution,
   lifespan,
   ss,
-  max_players_per_q,
+  max_scientists_per_q,
   startup_cost,
   sample_cost,
   exp_shape,
   decay,
   b_neg,
   abandon_prob,
-  num_players,
+  num_scientists,
   min_sample_size,
   max_sample_size
 )
@@ -27,7 +27,7 @@ play_complexcomp(
 
 \item{ss}{ss}
 
-\item{max_players_per_q}{max_players_per_q}
+\item{max_scientists_per_q}{max_scientists_per_q}
 
 \item{startup_cost}{startup_cost}
 
@@ -41,7 +41,7 @@ play_complexcomp(
 
 \item{abandon_prob}{abandon_prob}
 
-\item{num_players}{num_players}
+\item{num_scientists}{num_scientists}
 
 \item{min_sample_size}{min_sample_size}
 

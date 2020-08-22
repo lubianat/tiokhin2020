@@ -142,6 +142,13 @@ do.
 
 The same goes for `questions_e_size`
 
+# Repeat the same name for the same things
+
+The players/scientists are refered to sometimes as "players" and 
+sometimes as "scientists." While this is good for prose, it becomes 
+rather challenging to understand that both are actually the same. 
+
+I have changed the word "players" for the word "scientists" everywhere
 
 # Step 1: 
 

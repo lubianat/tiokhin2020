@@ -18,14 +18,14 @@ NULL
 #' @param evolution evolution
 #' @param lifespan lifespan
 #' @param ss ss
-#' @param max_players_per_q max_players_per_q
+#' @param max_scientists_per_q max_scientists_per_q
 #' @param startup_cost startup_cost
 #' @param sample_cost sample_cost
 #' @param exp_shape exp_shape
 #' @param decay decay
 #' @param b_neg b_neg
 #' @param abandon_prob abandon_prob
-#' @param num_players num_players
+#' @param num_scientists num_scientists
 #' @param min_sample_size min_sample_size
 #' @param max_sample_size max_sample_size
 #' @import pwr
@@ -36,20 +36,20 @@ play_complexcomp <-
   function(evolution,
            lifespan,
            ss,
-           max_players_per_q,
+           max_scientists_per_q,
            startup_cost,
            sample_cost,
            exp_shape,
            decay,
            b_neg,
            abandon_prob,
-           num_players,
+           num_scientists,
            min_sample_size,
            max_sample_size) {
    
     sample_sizes <- get_sample_sizes(evolution,
                                      ss, 
-                                     num_players,
+                                     num_scientists,
                                      min_sample_size, 
                                      max_sample_size)
     
@@ -60,11 +60,11 @@ play_complexcomp <-
                                               sample_sizes,
                                               abandon_prob,
                                               initial_payoffs,
-                                              num_players)
+                                              num_scientists)
    
     number_of_questions <- get_number_of_questions(lifespan, 
                                                     startup_cost, 
-                                                    num_players)
+                                                    num_scientists)
 
     ids_for_questions <- get_question_ids(number_of_questions)
 
@@ -72,14 +72,14 @@ play_complexcomp <-
     scientist_df <-
       assign_scientists_to_questions(scientist_df,
                                      ids_for_questions,
-                                     max_players_per_q,
+                                     max_scientists_per_q,
                                      ids_for_scientists)
     
     questions_e_size <- get_questions_e_size(number_of_questions,
                                              exp_shape)
 
     results_matrix <- get_results_matrix(number_of_questions,
-                                         max_players_per_q)
+                                         max_scientists_per_q)
     
     current_time_period <- 1
     time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
@@ -108,9 +108,9 @@ play_complexcomp <-
         get_t_test_powers(ss_of_samplers,
                           questions_e_size,
                           questions_they_are_working_on)
-      results_players_got <-
       
-          check_results_players_got(number_of_samplers, powers)
+      results_scientists_got <-
+        check_results_scientists_got(number_of_samplers, powers)
       
       for (i in 1:number_of_samplers) {
         num_prior <-
@@ -119,7 +119,7 @@ play_complexcomp <-
                                                           i)
         novelty_of_result <- calculate_novelty(num_prior, decay)
         payoff <-
-          calculate_payoff(results_players_got, i, novelty_of_result, b_neg)
+          calculate_payoff(results_scientists_got, i, novelty_of_result, b_neg)
         
         scientist_df <-
           add_payoff_to_that_sampler(scientist_df, sampler_ids, i, payoff)
@@ -140,7 +140,7 @@ play_complexcomp <-
           questions_they_are_working_on,
           sampler_ids,
           ss_of_samplers,
-          results_players_got
+          results_scientists_got
         )
       results_matrix[index_to_update,] <- set_of_results
       
@@ -159,7 +159,7 @@ play_complexcomp <-
         next_question <- get_next_question(
           questions_n_on_q,
           largest_question_available,
-          max_players_per_q,
+          max_scientists_per_q,
           ids_for_questions,
           max_previously_published_questions
         )
@@ -174,7 +174,7 @@ play_complexcomp <-
           next_question #move scientist to new question
       }
       
-      #reset the time until sampling for the subset of players who sampled
+      #reset the time until sampling for the subset of scientists who sampled
       time_cost_for_each_question[sampler_ids] <- time_cost_for_each_question_at_baseline[sampler_ids]
       
       #update positions of scientists who are working on questions where there just was published result
@@ -202,7 +202,7 @@ play_complexcomp <-
           
           if (any(runif(n_new, 0, 1) < scientist_df$abandon_prob[pos_potent_mover[i]])) {
             dum1 <-
-              questions_n_on_q[1:largest_q_avail_movers] < max_players_per_q
+              questions_n_on_q[1:largest_q_avail_movers] < max_scientists_per_q
             dum2 <-
               ids_for_questions[1:largest_q_avail_movers] > ineligible_max
             dum <- dum1 & dum2
@@ -213,7 +213,7 @@ play_complexcomp <-
               questions_n_on_q[next_question] + 1 # add 1 to next q
             scientist_df$question[pos_potent_mover[i]] <-
               next_question #move scientist to new question
-            #reset the time until sampling for the subset of players who moved
+            #reset the time until sampling for the subset of scientists who moved
             time_cost_for_each_question[pos_potent_mover[i]] <-
               time_cost_for_each_question_at_baseline[pos_potent_mover[i]]
           }
@@ -235,14 +235,14 @@ play_complexcomp <-
 get_sample_sizes <-
   function(evolution,
            ss,
-           num_players,
+           num_scientists,
            min_sample_size,
            max_sample_size) {
     if (evolution == 1) {
       samplesizes <- ss
     } else {
       samplesizes <-
-        round(runif(num_players, min_sample_size, max_sample_size))
+        round(runif(num_scientists, min_sample_size, max_sample_size))
     }
     return(samplesizes)
   }
@@ -256,8 +256,8 @@ get_initial_payoffs <- function(sample_sizes) {
 }
 
 get_number_of_questions <-
-  function(lifespan, startup_cost, num_players) {
-    round((lifespan / (startup_cost + 2)) * num_players) + 1000
+  function(lifespan, startup_cost, num_scientists) {
+    round((lifespan / (startup_cost + 2)) * num_scientists) + 1000
   }
 
 get_question_ids <- function(number_of_questions) {
@@ -267,10 +267,10 @@ get_question_ids <- function(number_of_questions) {
 assign_scientists_to_questions <-
   function(scientist_df,
            questions_q_id,
-           max_players_per_q,
+           max_scientists_per_q,
            ids_for_scientists) {
     scientist_df$question[ids_for_scientists] <-
-      rep(questions_q_id, each = max_players_per_q)[ids_for_scientists]
+      rep(questions_q_id, each = max_scientists_per_q)[ids_for_scientists]
     return(scientist_df)
   }
 
@@ -279,7 +279,7 @@ get_scientists_data_frame <-
            sample_sizes,
            abandon_prob,
            initial_payoffs,
-           num_players) {
+           num_scientists) {
     data.frame(
       sci_id = ids_for_scientists,
       ss = sample_sizes,
@@ -287,7 +287,7 @@ get_scientists_data_frame <-
       abandon_prob = abandon_prob,
       payoff = initial_payoffs,
       scooped = 0,
-      num_players = num_players
+      num_scientists = num_scientists
     )
   }
 
@@ -296,9 +296,9 @@ get_questions_e_size <- function(number_of_questions, exp_shape) {
 }
 
 get_results_matrix <-
-  function(number_of_questions, max_players_per_q) {
+  function(number_of_questions, max_scientists_per_q) {
     as.matrix(data.frame(
-      q_id = rep(0, number_of_questions * max_players_per_q),
+      q_id = rep(0, number_of_questions * max_scientists_per_q),
       sci_id = 0,
       ss = 0,
       result = 0
@@ -324,7 +324,7 @@ get_questions_they_are_working_on <-
     c(scientist_df$question[sampler_ids])
   }
 
-check_results_players_got <- function(num_samplers, powers) {
+check_results_scientists_got <- function(num_samplers, powers) {
   runif(num_samplers, 0, 1) < powers
 }
 
@@ -343,11 +343,11 @@ get_t_test_powers <-
   }
 
 calculate_payoff <-
-  function(results_players_got,
+  function(results_scientists_got,
            i,
            novelty_of_result,
            b_neg) {
-    if (results_players_got[i]) {
+    if (results_scientists_got[i]) {
       payoff <- novelty_of_result
     } else{
       payoff <- novelty_of_result * b_neg
@@ -375,10 +375,10 @@ add_payoff_to_that_sampler <-
 get_next_question <-
   function(questions_n_on_q,
            largest_q_avail,
-           max_players_per_q,
+           max_scientists_per_q,
            question_ids,
            max_previously_published_questions) {
-    dum1 <- questions_n_on_q[1:largest_q_avail] < max_players_per_q
+    dum1 <- questions_n_on_q[1:largest_q_avail] < max_scientists_per_q
     dum2 <-
       question_ids[1:largest_q_avail] > max_previously_published_questions
     dum <- dum1 & dum2

@@ -181,7 +181,7 @@ play_complexcomp <-
       ids_for_scooped_scientists <- get_scooped_scientists(scientist_df, questions_they_are_working_on, testers_ids)
       number_of_scooped_scientists <- length(ids_for_scooped_scientists)
       
-      largest_q_avail_movers <-
+      largest_question_for_scooped_scientists <-
         largest_question_id_available + number_of_scooped_scientists
       
       if (number_of_scooped_scientists > 0) {
@@ -208,12 +208,12 @@ play_complexcomp <-
                                                                              ids_for_scooped_scientists,
                                                                              i)
           if (scientist_gives_up) {
-            dum1 <-
-              scientists_per_question[1:largest_q_avail_movers] < max_scientists_per_q
-            dum2 <-
-              ids_for_questions[1:largest_q_avail_movers] > max_of_scoopers_questions
-            dum <- dum1 & dum2
-            next_question <- match(TRUE, dum)
+            checker_for_questions_not_full <- check_if_questions_are_not_full(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q)
+
+            checker_for_questions_not_taken_by_scoopers <- check_which_questions_have_not_been_taken_by_scoopers(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions)
+
+            checker_for_questions_available <- checker_for_questions_not_full & checker_for_questions_not_taken_by_scoopers
+            next_question <- match(TRUE, checker_for_questions_available)
             scientists_per_question[question_of_scooped_scientist] <-
               scientists_per_question[question_of_scooped_scientist] - 1 #subtract 1 from current 1
             scientists_per_question[next_question] <-
@@ -424,3 +424,12 @@ get_scooper_questions <- function(scientist_df, scooper_ids) {
 test_probabilistically_if_scientist_gives_up <- function(number_of_publications_of_scooped_question, scientist_df, ids_for_scooped_scientists, i) {
   any(runif(number_of_publications_of_scooped_question, 0, 1) < scientist_df$abandon_prob[ids_for_scooped_scientists[i]])
 }
+
+check_if_questions_are_not_full <- function(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q) {
+  scientists_per_question[1:largest_question_for_scooped_scientists] < max_scientists_per_q
+}
+
+check_which_questions_have_not_been_taken_by_scoopers <- function(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions) {
+  ids_for_questions[1:largest_question_for_scooped_scientists] > max_of_scoopers_questions
+}
+

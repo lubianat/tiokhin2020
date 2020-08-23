@@ -213,16 +213,23 @@ play_complexcomp <-
             checker_for_questions_not_taken_by_scoopers <- check_which_questions_have_not_been_taken_by_scoopers(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions)
 
             checker_for_questions_available <- checker_for_questions_not_full & checker_for_questions_not_taken_by_scoopers
-            next_question <- match(TRUE, checker_for_questions_available)
-            scientists_per_question[question_of_scooped_scientist] <-
-              scientists_per_question[question_of_scooped_scientist] - 1 #subtract 1 from current 1
-            scientists_per_question[next_question] <-
-              scientists_per_question[next_question] + 1 # add 1 to next q
-            scientist_df$question[ids_for_scooped_scientists[i]] <-
-              next_question #move scientist to new question
-            #reset the time until sampling for the subset of scientists who moved
-            time_cost_for_each_question[ids_for_scooped_scientists[i]] <-
-              time_cost_for_each_question_at_baseline[ids_for_scooped_scientists[i]]
+            
+            first_question_available <- get_first_question_available(checker_for_questions_available)
+
+            
+            scientists_per_question <- update_scientists_per_question(scientists_per_question, question_of_scooped_scientist, first_question_available)
+            
+
+            scientist_df <- move_scientist_to_new_question(scientist_df,
+                                           ids_for_scooped_scientists,
+                                           i,
+                                           first_question_available)
+
+            time_cost_for_each_question <- reset_time_cost_for_scooped_scientists_that_changed_question(time_cost_for_each_question, 
+                                                                                                        ids_for_scooped_scientists, 
+                                                                                                        i,
+                                                                                                        time_cost_for_each_question_at_baseline)
+              
           }
         }
       }
@@ -433,3 +440,28 @@ check_which_questions_have_not_been_taken_by_scoopers <- function(ids_for_questi
   ids_for_questions[1:largest_question_for_scooped_scientists] > max_of_scoopers_questions
 }
 
+update_scientists_per_question <- function(scientists_per_question, question_of_scooped_scientist, first_question_available) {
+  scientists_per_question[question_of_scooped_scientist] <-
+    scientists_per_question[question_of_scooped_scientist] - 1
+  
+  scientists_per_question[first_question_available] <-
+    scientists_per_question[first_question_available] + 1
+  
+  scientists_per_question
+}
+
+move_scientist_to_new_question <- function(scientist_df, ids_for_scooped_scientists, i, first_question_available) {
+  scientist_df$question[ids_for_scooped_scientists[i]] <-
+    first_question_available
+  return(scientist_df)
+}
+
+get_first_question_available <- function(checker_for_questions_available) {
+  match(TRUE, checker_for_questions_available)
+}
+
+reset_time_cost_for_scooped_scientists_that_changed_question <- function(time_cost_for_each_question, ids_for_scooped_scientists, i, time_cost_for_each_question_at_baseline) {
+  time_cost_for_each_question[ids_for_scooped_scientists[i]] <-
+    time_cost_for_each_question_at_baseline[ids_for_scooped_scientists[i]]
+  time_cost_for_each_question
+}

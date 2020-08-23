@@ -134,8 +134,9 @@ play_complexcomp <-
         results_tracker_old + number_of_testers
       
       
-      index_to_update <-
+      indexes_to_update <-
         (results_tracker_old + 1):results_tracker_new
+      
       set_of_results <-
         c(
           questions_they_are_working_on,
@@ -143,10 +144,10 @@ play_complexcomp <-
           sample_size_of_testers,
           results_scientists_got
         )
-      results_matrix[index_to_update,] <- set_of_results
+      results_matrix[indexes_to_update,] <- set_of_results
       
 
-      largest_question_available <-
+      largest_question_id_available <-
         max(scientist_df$question) + number_of_testers
   
       max_previously_published_question <-
@@ -158,7 +159,7 @@ play_complexcomp <-
       for (i in 1:number_of_testers) {
         next_question <- get_next_question(
           scientists_per_question,
-          largest_question_available,
+          largest_question_id_available,
           max_scientists_per_q,
           ids_for_questions,
           max_previously_published_question
@@ -171,29 +172,28 @@ play_complexcomp <-
         scientists_per_question[next_question] <-
           scientists_per_question[next_question] + 1
         
-        scientist_df$question[testers_ids[i]] <-
-          next_question #move scientist to new question
+        scientist_df$question[testers_ids[i]] <-    next_question 
       }
       
       
       time_cost_for_each_question <- reset_time_cost_for_testers(time_cost_for_each_question, testers_ids, time_cost_for_each_question_at_baseline) 
 
-      #update positions of scientists who are working on questions where there just was published result
-      pos_potent_mover <- get_potent_mover(scientist_df, questions_they_are_working_on, testers_ids)
-      num_potent_movers <- length(pos_potent_mover)
+      ids_for_scooped_scientists <- get_scooped_scientists(scientist_df, questions_they_are_working_on, testers_ids)
+      number_of_scooped_scientists <- length(ids_for_scooped_scientists)
       
-      # limit search for new questions to the smaller subset of all q's that could potentially be moved to, for movers
       largest_q_avail_movers <-
-        largest_question_available + num_potent_movers
+        largest_question_id_available + number_of_scooped_scientists
       
-      if (num_potent_movers > 0) {
-        for (i in 1:num_potent_movers) {
-          #questions that the scooped scientist is working on
-          question_of_scoopee <-
-            scientist_df$question[pos_potent_mover[i]]
-          #id of the scooper
-          scooper_id <-
-            testers_ids[questions_they_are_working_on == question_of_scoopee]
+      if (number_of_scooped_scientists > 0) {
+        
+        for (i in 1:number_of_scooped_scientists) {
+          
+          question_of_scooped_scientist <-get_question_of_scooped_scientist(scientist_df,
+                                                                            ids_for_scooped_scientists,
+                                                                            i)
+
+          scooper_id <- get_scooper_of_this_scientist(testers_ids, questions_they_are_working_on, question_of_scooped_scientist)
+
           #take max of scooper current questions
           ineligible_max <-
             max(scientist_df$question[scientist_df$sci_id %fin% scooper_id])
@@ -201,22 +201,22 @@ play_complexcomp <-
           #number of new results that have been published on that scientist's question
           n_new <- length(scooper_id)
           
-          if (any(runif(n_new, 0, 1) < scientist_df$abandon_prob[pos_potent_mover[i]])) {
+          if (any(runif(n_new, 0, 1) < scientist_df$abandon_prob[ids_for_scooped_scientists[i]])) {
             dum1 <-
               scientists_per_question[1:largest_q_avail_movers] < max_scientists_per_q
             dum2 <-
               ids_for_questions[1:largest_q_avail_movers] > ineligible_max
             dum <- dum1 & dum2
             next_question <- match(TRUE, dum)
-            scientists_per_question[question_of_scoopee] <-
-              scientists_per_question[question_of_scoopee] - 1 #subtract 1 from current 1
+            scientists_per_question[question_of_scooped_scientist] <-
+              scientists_per_question[question_of_scooped_scientist] - 1 #subtract 1 from current 1
             scientists_per_question[next_question] <-
               scientists_per_question[next_question] + 1 # add 1 to next q
-            scientist_df$question[pos_potent_mover[i]] <-
+            scientist_df$question[ids_for_scooped_scientists[i]] <-
               next_question #move scientist to new question
             #reset the time until sampling for the subset of scientists who moved
-            time_cost_for_each_question[pos_potent_mover[i]] <-
-              time_cost_for_each_question_at_baseline[pos_potent_mover[i]]
+            time_cost_for_each_question[ids_for_scooped_scientists[i]] <-
+              time_cost_for_each_question_at_baseline[ids_for_scooped_scientists[i]]
           }
         }
       }
@@ -388,7 +388,7 @@ get_next_question <-
   }
 
 
-get_potent_mover <- function(scientist_df, questions_they_are_working_on, sampler_ids) {
+get_scooped_scientists <- function(scientist_df, questions_they_are_working_on, sampler_ids) {
   which(
     scientist_df$question %fin% questions_they_are_working_on &
       !scientist_df$sci_id %fin% sampler_ids
@@ -398,4 +398,12 @@ get_potent_mover <- function(scientist_df, questions_they_are_working_on, sample
 reset_time_cost_for_testers <- function(time_cost_for_each_question, testers_ids, time_cost_for_each_question_at_baseline) {
   time_cost_for_each_question[testers_ids] <- time_cost_for_each_question_at_baseline[testers_ids]
   time_cost_for_each_question
-  }
+}
+
+get_question_of_scooped_scientist <- function(scientist_df, ids_for_scooped_scientists, i) {
+  scientist_df$question[ids_for_scooped_scientists[i]]
+}
+
+get_scooper_of_this_scientist <- function(testers_ids, questions_they_are_working_on, question_of_scooped_scientist) {
+  testers_ids[questions_they_are_working_on == question_of_scooped_scientist]
+}

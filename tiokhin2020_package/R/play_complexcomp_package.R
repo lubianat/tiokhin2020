@@ -192,20 +192,26 @@ play_complexcomp <-
                                                                             ids_for_scooped_scientists,
                                                                             i)
 
-          scooper_id <- get_scooper_of_this_scientist(testers_ids, questions_they_are_working_on, question_of_scooped_scientist)
+          scooper_ids <- get_scooper_of_this_scientist(testers_ids,
+                                                      questions_they_are_working_on,
+                                                      question_of_scooped_scientist)
 
-          #take max of scooper current questions
-          ineligible_max <-
-            max(scientist_df$question[scientist_df$sci_id %fin% scooper_id])
+ 
+          scoopers_questions = get_scooper_questions(scientist_df, scooper_ids)
+
+          max_of_scoopers_questions <-   max(scoopers_questions)
           
-          #number of new results that have been published on that scientist's question
-          n_new <- length(scooper_id)
-          
-          if (any(runif(n_new, 0, 1) < scientist_df$abandon_prob[ids_for_scooped_scientists[i]])) {
+          number_of_publications_of_scooped_question <- length(scooper_ids)
+
+          scientist_gives_up <- test_probabilistically_if_scientist_gives_up(number_of_publications_of_scooped_question,
+                                                                             scientist_df,
+                                                                             ids_for_scooped_scientists,
+                                                                             i)
+          if (scientist_gives_up) {
             dum1 <-
               scientists_per_question[1:largest_q_avail_movers] < max_scientists_per_q
             dum2 <-
-              ids_for_questions[1:largest_q_avail_movers] > ineligible_max
+              ids_for_questions[1:largest_q_avail_movers] > max_of_scoopers_questions
             dum <- dum1 & dum2
             next_question <- match(TRUE, dum)
             scientists_per_question[question_of_scooped_scientist] <-
@@ -404,6 +410,17 @@ get_question_of_scooped_scientist <- function(scientist_df, ids_for_scooped_scie
   scientist_df$question[ids_for_scooped_scientists[i]]
 }
 
+
 get_scooper_of_this_scientist <- function(testers_ids, questions_they_are_working_on, question_of_scooped_scientist) {
   testers_ids[questions_they_are_working_on == question_of_scooped_scientist]
+}
+
+
+get_scooper_questions <- function(scientist_df, scooper_ids) {
+  scientist_df$question[scientist_df$sci_id %fin% scooper_ids]
+}
+
+
+test_probabilistically_if_scientist_gives_up <- function(number_of_publications_of_scooped_question, scientist_df, ids_for_scooped_scientists, i) {
+  any(runif(number_of_publications_of_scooped_question, 0, 1) < scientist_df$abandon_prob[ids_for_scooped_scientists[i]])
 }

@@ -47,33 +47,20 @@ play_complexcomp <-
            min_sample_size,
            max_sample_size) {
    
-    sample_sizes <- get_sample_sizes(evolution,
-                                     ss, 
-                                     num_scientists,
-                                     min_sample_size, 
-                                     max_sample_size)
+    scientist_df <- build_initial_scientists_df(evolution,
+                                ss,
+                                num_scientists,
+                                min_sample_size,
+                                max_sample_size,
+                                abandon_prob,
+                                lifespan,
+                                startup_cost,
+                                max_scientists_per_q)
     
-    ids_for_scientists <- get_ids_for_scientists(sample_sizes) 
-    initial_payoffs <- get_initial_payoffs(sample_sizes)
-
-    scientist_df <- get_scientists_data_frame(ids_for_scientists,
-                                              sample_sizes,
-                                              abandon_prob,
-                                              initial_payoffs,
-                                              num_scientists)
-   
     number_of_questions <- get_number_of_questions(lifespan, 
-                                                    startup_cost, 
-                                                    num_scientists)
-
+                                                   startup_cost, 
+                                                   num_scientists)
     ids_for_questions <- get_question_ids(number_of_questions)
-
-    
-    scientist_df <-
-      assign_scientists_to_questions(scientist_df,
-                                     ids_for_questions,
-                                     max_scientists_per_q,
-                                     ids_for_scientists)
     
     questions_e_size <- get_questions_e_size(number_of_questions,
                                              exp_shape)
@@ -82,6 +69,8 @@ play_complexcomp <-
                                          max_scientists_per_q)
     
     current_time_period <- 1
+
+    sample_sizes <- scientist_df$ss
     time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
     time_cost_for_each_question_at_baseline <- time_cost_for_each_question
     
@@ -465,3 +454,35 @@ reset_time_cost_for_scooped_scientists_that_changed_question <- function(time_co
     time_cost_for_each_question_at_baseline[ids_for_scooped_scientists[i]]
   time_cost_for_each_question
 }
+
+build_initial_scientists_df <- function(evolution, ss, num_scientists, min_sample_size, max_sample_size, abandon_prob, lifespan, startup_cost, max_scientists_per_q) {
+  sample_sizes <- get_sample_sizes(evolution,
+                                   ss, 
+                                   num_scientists,
+                                   min_sample_size, 
+                                   max_sample_size)
+  
+  ids_for_scientists <- get_ids_for_scientists(sample_sizes)
+  
+  initial_payoffs <- get_initial_payoffs(sample_sizes)
+  
+  scientist_df <- get_scientists_data_frame(ids_for_scientists,
+                                            sample_sizes,
+                                            abandon_prob,
+                                            initial_payoffs,
+                                            num_scientists)
+  
+  number_of_questions <- get_number_of_questions(lifespan, 
+                                                 startup_cost, 
+                                                 num_scientists)
+  
+  ids_for_questions <- get_question_ids(number_of_questions)
+  
+  
+  scientist_df <-
+    assign_scientists_to_questions(scientist_df,
+                                   ids_for_questions,
+                                   max_scientists_per_q,
+                                   ids_for_scientists)
+}
+

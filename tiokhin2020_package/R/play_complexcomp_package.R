@@ -191,9 +191,7 @@ play_complexcomp <-
 
           max_of_scoopers_questions <-   max(scoopers_questions)
           
-          number_of_publications_of_scooped_question <- length(scooper_ids)
-
-          scientist_gives_up <- test_probabilistically_if_scientist_gives_up(number_of_publications_of_scooped_question,
+          scientist_gives_up <- test_probabilistically_if_scientist_gives_up(scooper_ids,
                                                                              scientist_df,
                                                                              ids_for_scooped_scientists,
                                                                              i)
@@ -205,7 +203,9 @@ play_complexcomp <-
                                                                                      ids_for_questions,
                                                                                      max_of_scoopers_questions)
               
-            scientists_per_question <- update_scientists_per_question(scientists_per_question, question_of_scooped_scientist, first_question_available)
+            scientists_per_question <- update_scientists_per_question(scientists_per_question,
+                                                                      question_of_scooped_scientist,
+                                                                      first_question_available)
             
 
             scientist_df <- move_scientist_to_new_question(scientist_df,
@@ -416,7 +416,9 @@ get_scooper_questions <- function(scientist_df, scooper_ids) {
 }
 
 
-test_probabilistically_if_scientist_gives_up <- function(number_of_publications_of_scooped_question, scientist_df, ids_for_scooped_scientists, i) {
+test_probabilistically_if_scientist_gives_up <- function(scooper_ids, scientist_df, ids_for_scooped_scientists, i) {
+  number_of_publications_of_scooped_question <- length(scooper_ids)
+  
   any(runif(number_of_publications_of_scooped_question, 0, 1) < scientist_df$abandon_prob[ids_for_scooped_scientists[i]])
 }
 

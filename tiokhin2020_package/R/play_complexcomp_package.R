@@ -70,8 +70,11 @@ play_complexcomp <-
     
     current_time_period <- 1
 
-    sample_sizes <- scientist_df$ss
-    time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
+
+    time_cost_for_each_question <- get_time_cost_for_each_question(scientist_df,
+                                                                   sample_cost,
+                                                                   startup_cost)
+    
     time_cost_for_each_question_at_baseline <- time_cost_for_each_question
     
     previously_published_questions <- vector()
@@ -485,4 +488,11 @@ build_initial_scientists_df <- function(evolution, ss, num_scientists, min_sampl
                                    max_scientists_per_q,
                                    ids_for_scientists)
 }
+
+get_time_cost_for_each_question <- function(scientist_df, sample_cost, startup_cost) {
+  sample_sizes <- scientist_df$ss
+  time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
+}
+
+
 

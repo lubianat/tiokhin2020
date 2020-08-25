@@ -162,6 +162,17 @@ kind of sintactically mixed with "sample size."
 
 I've changed `samplers` to `testers`.
 
+# Group similar variables into an object
+
+This is more advanced, but R has [S4 classes](https://www.datamentor.io/r-programming/s4-class/) that
+can be used to group many different variables. This makes it cleaner
+to pass blocks of related variables around. 
+
+The abstractions and the syntax to do it, however, are more complex and take more time. 
+
+They would make the code much more readable and testable, but I'm afraid we don't have the time to do
+that big of a change.
+
 
 # Step 1: 
 

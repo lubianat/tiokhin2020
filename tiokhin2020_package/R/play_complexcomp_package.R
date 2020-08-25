@@ -185,8 +185,7 @@ play_complexcomp <-
           scooper_ids <- get_scooper_of_this_scientist(testers_ids,
                                                       questions_they_are_working_on,
                                                       question_of_scooped_scientist)
-
- 
+          
           scoopers_questions = get_scooper_questions(scientist_df, scooper_ids)
 
           max_of_scoopers_questions <-   max(scoopers_questions)

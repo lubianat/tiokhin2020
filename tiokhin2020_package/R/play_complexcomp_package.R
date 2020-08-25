@@ -82,6 +82,9 @@ play_complexcomp <-
   ##### Start the simulation  #####
     
     while (current_time_period < lifespan) {
+      
+      ##### Set up time-related parameters #####
+      
       time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
       time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
       current_time_period <- current_time_period + time_to_next_event
@@ -89,6 +92,8 @@ play_complexcomp <-
       if (current_time_period >= lifespan) {
         break
       }
+      
+      ##### Run round for scientist who are testing questions (testers) #####
       
       testers_ids <- get_tester_ids(scientist_df, time_cost_for_each_question)
       number_of_testers <- length(testers_ids)
@@ -136,7 +141,6 @@ play_complexcomp <-
         )
       results_matrix[indexes_to_update,] <- set_of_results
       
-
       largest_question_id_available <-
         max(scientist_df$question) + number_of_testers
   
@@ -145,6 +149,8 @@ play_complexcomp <-
       
       scientists_per_question <-
         get_scientists_per_question(number_of_questions, scientist_df)
+      
+      ##### Move testers forward #####
       
       for (i in 1:number_of_testers) {
         next_question <- get_next_question(
@@ -168,6 +174,8 @@ play_complexcomp <-
                                                                  testers_ids,
                                                                  time_cost_for_each_question_at_baseline) 
 
+      ##### Deal with scientists that have been scooped #####
+      
       ids_for_scooped_scientists <- get_scooped_scientists(scientist_df, questions_they_are_working_on, testers_ids)
       number_of_scooped_scientists <- length(ids_for_scooped_scientists)
       
@@ -194,6 +202,8 @@ play_complexcomp <-
                                                                              scientist_df,
                                                                              ids_for_scooped_scientists,
                                                                              i)
+          
+          ##### Moved scooped scientists to next question #####
           if (scientist_gives_up) {
 
             first_question_available <- make_checks_and_get_first_question_available(scientists_per_question,

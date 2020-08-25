@@ -61,27 +61,24 @@ play_complexcomp <-
                                                    startup_cost, 
                                                    num_scientists)
     ids_for_questions <- get_question_ids(number_of_questions)
-    
     questions_e_size <- get_questions_e_size(number_of_questions,
                                              exp_shape)
 
     results_matrix <- get_results_matrix(number_of_questions,
                                          max_scientists_per_q)
     
-    current_time_period <- 1
-
 
     time_cost_for_each_question <- get_time_cost_for_each_question(scientist_df,
                                                                    sample_cost,
                                                                    startup_cost)
-    
     time_cost_for_each_question_at_baseline <- time_cost_for_each_question
-    
+   
+    current_time_period <- 1
     previously_published_questions <- vector()
     results_tracker_old <- 0
     
     while (current_time_period < lifespan) {
-      time_to_next_event <- min(c(time_cost_for_each_question, lifespan - current_time_period))
+      time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
       time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
       current_time_period <- current_time_period + time_to_next_event
       
@@ -492,7 +489,11 @@ build_initial_scientists_df <- function(evolution, ss, num_scientists, min_sampl
 get_time_cost_for_each_question <- function(scientist_df, sample_cost, startup_cost) {
   sample_sizes <- scientist_df$ss
   time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
+  return(time_cost_for_each_question)
 }
 
+get_time_to_next_event <- function(time_cost_for_each_question, lifespan, current_time_period) {
+  min(c(time_cost_for_each_question, lifespan - current_time_period))
+}
 
 

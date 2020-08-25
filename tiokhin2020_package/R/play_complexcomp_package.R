@@ -46,6 +46,8 @@ play_complexcomp <-
            num_scientists,
            min_sample_size,
            max_sample_size) {
+    
+  ##### Set the initial parameters before the loop #####
    
     scientist_df <- build_initial_scientists_df(evolution,
                                 ss,
@@ -77,6 +79,8 @@ play_complexcomp <-
     previously_published_questions <- vector()
     results_tracker_old <- 0
     
+  ##### Start the simulation  #####
+    
     while (current_time_period < lifespan) {
       time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
       time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
@@ -102,18 +106,15 @@ play_complexcomp <-
       results_scientists_got <-
         check_results_scientists_got(number_of_testers, powers)
       
-      for (i in 1:number_of_testers) {
-        num_prior <-
-          count_all_prior_published_results_for_questions(previously_published_questions,
-                                                          questions_they_are_working_on,
-                                                          i)
-        novelty_of_result <- calculate_novelty(num_prior, decay)
-        payoff <-
-          calculate_payoff(results_scientists_got, i, novelty_of_result, b_neg)
-        
-        scientist_df <-
-          add_payoff_to_that_tester(scientist_df, testers_ids, i, payoff)
-      }
+      scientist_df <- calculate_and_deliver_payoffs(number_of_testers,
+                                    previously_published_questions,
+                                    questions_they_are_working_on,
+                                    i,
+                                    decay,
+                                    results_scientists_got,
+                                    b_neg,
+                                    scientist_df,
+                                    testers_ids)
       
       previously_published_questions <-
         c(previously_published_questions,
@@ -496,4 +497,23 @@ get_time_to_next_event <- function(time_cost_for_each_question, lifespan, curren
   min(c(time_cost_for_each_question, lifespan - current_time_period))
 }
 
+calculate_and_deliver_payoffs <- function(number_of_testers, previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids) {
+  for (i in 1:number_of_testers) {
+    scientist_df <-  calculate_and_deliver_payoff(previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids)
+  }
+  return(scientist_df)
+}
 
+calculate_and_deliver_payoff <- function(previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids) {
+  num_prior <-
+    count_all_prior_published_results_for_questions(previously_published_questions,
+                                                    questions_they_are_working_on,
+                                                    i)
+  novelty_of_result <- calculate_novelty(num_prior, decay)
+  payoff <-
+    calculate_payoff(results_scientists_got, i, novelty_of_result, b_neg)
+  
+  scientist_df <-
+    add_payoff_to_that_tester(scientist_df, testers_ids, i, payoff)
+  return(scientist_df)
+}

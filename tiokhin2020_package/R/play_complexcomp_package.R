@@ -154,19 +154,19 @@ play_complexcomp <-
           ids_for_questions,
           max_previously_published_question
         )
+
         
-        
-        scientists_per_question[questions_they_are_working_on[i]] <-
-          scientists_per_question[questions_they_are_working_on[i]] - 1
-        
-        scientists_per_question[next_question] <-
-          scientists_per_question[next_question] + 1
+        scientists_per_question <- update_scientists_per_question(scientists_per_question,
+                                                                  question_to_abandon=questions_they_are_working_on,
+                                                                  question_to_go_to=next_question )
         
         scientist_df$question[testers_ids[i]] <-    next_question 
       }
       
       
-      time_cost_for_each_question <- reset_time_cost_for_testers(time_cost_for_each_question, testers_ids, time_cost_for_each_question_at_baseline) 
+      time_cost_for_each_question <- reset_time_cost_for_testers(time_cost_for_each_question,
+                                                                 testers_ids,
+                                                                 time_cost_for_each_question_at_baseline) 
 
       ids_for_scooped_scientists <- get_scooped_scientists(scientist_df, questions_they_are_working_on, testers_ids)
       number_of_scooped_scientists <- length(ids_for_scooped_scientists)
@@ -178,7 +178,7 @@ play_complexcomp <-
         
         for (i in 1:number_of_scooped_scientists) {
           
-          question_of_scooped_scientist <-get_question_of_scooped_scientist(scientist_df,
+          question_of_scooped_scientist <- get_question_of_scooped_scientist(scientist_df,
                                                                             ids_for_scooped_scientists,
                                                                             i)
 
@@ -198,15 +198,13 @@ play_complexcomp <-
                                                                              ids_for_scooped_scientists,
                                                                              i)
           if (scientist_gives_up) {
-            checker_for_questions_not_full <- check_if_questions_are_not_full(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q)
 
-            checker_for_questions_not_taken_by_scoopers <- check_which_questions_have_not_been_taken_by_scoopers(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions)
-
-            checker_for_questions_available <- checker_for_questions_not_full & checker_for_questions_not_taken_by_scoopers
-            
-            first_question_available <- get_first_question_available(checker_for_questions_available)
-
-            
+            first_question_available <- make_checks_and_get_first_question_available(scientists_per_question,
+                                                                                     largest_question_for_scooped_scientists,
+                                                                                     max_scientists_per_q,
+                                                                                     ids_for_questions,
+                                                                                     max_of_scoopers_questions)
+              
             scientists_per_question <- update_scientists_per_question(scientists_per_question, question_of_scooped_scientist, first_question_available)
             
 
@@ -430,12 +428,14 @@ check_which_questions_have_not_been_taken_by_scoopers <- function(ids_for_questi
   ids_for_questions[1:largest_question_for_scooped_scientists] > max_of_scoopers_questions
 }
 
-update_scientists_per_question <- function(scientists_per_question, question_of_scooped_scientist, first_question_available) {
-  scientists_per_question[question_of_scooped_scientist] <-
-    scientists_per_question[question_of_scooped_scientist] - 1
+update_scientists_per_question <- function(scientists_per_question, 
+                                           question_to_abandon,
+                                           question_to_go_to) {
+  scientists_per_question[question_to_abandon] <-
+    scientists_per_question[question_to_abandon] - 1
   
-  scientists_per_question[first_question_available] <-
-    scientists_per_question[first_question_available] + 1
+  scientists_per_question[question_to_go_to] <-
+    scientists_per_question[question_to_go_to] + 1
   
   scientists_per_question
 }
@@ -516,4 +516,14 @@ calculate_and_deliver_payoff <- function(previously_published_questions, questio
   scientist_df <-
     add_payoff_to_that_tester(scientist_df, testers_ids, i, payoff)
   return(scientist_df)
+}
+
+make_checks_and_get_first_question_available <- function(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q, ids_for_questions, max_of_scoopers_questions) {
+  checker_for_questions_not_full <- check_if_questions_are_not_full(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q)
+  
+  checker_for_questions_not_taken_by_scoopers <- check_which_questions_have_not_been_taken_by_scoopers(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions)
+  
+  checker_for_questions_available <- checker_for_questions_not_full & checker_for_questions_not_taken_by_scoopers
+  
+  first_question_available <- get_first_question_available(checker_for_questions_available)
 }

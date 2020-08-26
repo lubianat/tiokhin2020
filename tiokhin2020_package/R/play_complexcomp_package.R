@@ -62,8 +62,9 @@ play_complexcomp <-
     number_of_questions <- get_number_of_questions(lifespan, 
                                                    startup_cost, 
                                                    num_scientists)
+    
     ids_for_questions <- get_question_ids(number_of_questions)
-    questions_e_size <- get_questions_e_size(number_of_questions,
+    questions_e_size <- get_questions_effect_size(number_of_questions,
                                              exp_shape)
 
     results_matrix <- get_results_matrix(number_of_questions,
@@ -263,6 +264,7 @@ get_ids_for_scientists <- function(sample_sizes) {
 }
 
 get_initial_payoffs <- function(sample_sizes) {
+  # Not set to exactly zero because it is normalized eventually
   rep(0.0000001, length = length(sample_sizes))
 }
 
@@ -302,7 +304,7 @@ get_scientists_data_frame <-
     )
   }
 
-get_questions_e_size <- function(number_of_questions, exp_shape) {
+get_questions_effect_size <- function(number_of_questions, exp_shape) {
   round(rexp(number_of_questions, exp_shape), 1)
 }
 

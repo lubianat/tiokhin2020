@@ -357,6 +357,16 @@ decay_2nd <- c(0, 0.15, 0.40, 1, 10) #how quickly payoffs for non-novel publicat
 start_c <- c(10, 100, 200, 400) #startup cost
 
 ###Run###
-#              LIFE   MAX_PER_Q,   G,    Rep,   SCS,  SCS2,   E_RATE, DECAY,     B_NEG)
-run_complexsim(15000, max_on_q,   500,   50,   start_c,   1,   c(5),  decay_2nd, ben_neg)
+run_complexsim(LIFE = 15000,
+               MAX_PER_Q = max_on_q,
+               G = 500,   
+               R = 50,
+               SCS = start_c,
+               SCS2 = 1,
+               EXP_RATE = c(5),
+               SCOOPED_DECAY = decay_2nd,
+               B_NEG = ben_neg)
+
+
+
 

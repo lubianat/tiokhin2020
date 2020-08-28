@@ -206,7 +206,12 @@ whole code, which is already good
 
 The part now is to extract the individual bits of the `play_complexcomp` function and test them individually, one by one. 
 
+# Step 2
 
+## Cleaning Main_CompetitionSimulation_Code.R
+
+The `play_complexcomp` is very similar as in the other code. I could not note any difference.
+It was, then, substituted by the code in the R package. 
 
 
 ### Actual problems

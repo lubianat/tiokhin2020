@@ -213,6 +213,9 @@ The part now is to extract the individual bits of the `play_complexcomp` functio
 The `play_complexcomp` is very similar as in the other code. I could not note any difference.
 It was, then, substituted by the code in the R package. 
 
+Now I'll move `run_complexsim` to the package, where I can test it. 
+
+
 
 ### Actual problems
 

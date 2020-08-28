@@ -8,7 +8,7 @@ Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: Private
 Encoding: UTF-8
-Imports: RColorBrewer, dplyr, fastmatch, ggplot2, plyr, profvis, pwr, viridis, viridisLite
+Imports: RColorBrewer, dplyr, fastmatch, ggplot2, plyr, profvis, pwr, viridis, viridisLite, assertive
 LazyData: true
 RoxygenNote: 7.1.0
 Suggests: 

@@ -215,6 +215,16 @@ It was, then, substituted by the code in the R package.
 
 Now I'll move `run_complexsim` to the package, where I can test it. 
 
+## Assert minimum and maximum values acepted
+
+A good practice is to "sanitize" user inputs: check if they are within reasonable values. 
+
+There is a good introduction to assertive programming in [this blogpost](https://towardsdatascience.com/assertive-programming-in-r-36c3cc290930).
+
+I will implement it ussing the [assertive package](https://cran.r-project.org/web/packages/assertive/assertive.pdf). 
+
+lifespan : Positive integer. Lets set  a minimum of 500 and a maximum of 50 000 as reasonable max and minimum. 
+
 
 
 ### Actual problems

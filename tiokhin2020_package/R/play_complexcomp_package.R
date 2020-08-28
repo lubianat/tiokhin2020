@@ -16,7 +16,7 @@ NULL
 #' including measure of number of scoops
 #'
 #' @param evolution evolution
-#' @param lifespan lifespan
+#' @param lifespan lifespan; smaller lifespan = more noise 
 #' @param ss ss
 #' @param max_scientists_per_q max_scientists_per_q
 #' @param startup_cost startup_cost
@@ -29,6 +29,7 @@ NULL
 #' @param min_sample_size min_sample_size
 #' @param max_sample_size max_sample_size
 #' @import pwr
+#' @import assertive
 #' @return
 #' @export
 #'
@@ -47,6 +48,9 @@ play_complexcomp <-
            min_sample_size,
            max_sample_size) {
     
+ ##### Assert inputs as sanity check #####
+    
+
   ##### Set the initial parameters before the loop #####
    
     scientist_df <- build_initial_scientists_df(evolution,

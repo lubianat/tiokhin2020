@@ -20,19 +20,19 @@ test_that("play_complexcomp works", {
   max_sample_size = 12
   
   test_sim <- play_complexcomp(
-    evolution,
-    lifespan,
-    ss,
-    max_scientists_per_q,
-    startup_cost,
-    sample_cost,
-    exp_shape,
-    decay,
-    b_neg,
-    abandon_prob,
-    num_scientists,
-    min_sample_size,
-    max_sample_size
+    evolution = evolution ,
+    lifespan = lifespan,
+    ss = ss, 
+    max_scientists_per_q = max_scientists_per_q,
+    startup_cost = startup_cost,
+    sample_cost = sample_cost,
+    exp_shape = exp_shape,
+    decay = decay,
+    b_neg = b_neg,
+    abandon_prob = abandon_prob,
+    num_scientists = num_scientists,
+    min_sample_size = min_sample_size,
+    max_sample_size = max_sample_size
   )
   expect_equal(test_sim, base_sim)
 })

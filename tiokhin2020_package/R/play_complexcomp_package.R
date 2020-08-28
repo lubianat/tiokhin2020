@@ -17,7 +17,6 @@ NULL
 #'
 #' @param evolution A boolean. When set to TRUE, sample sizes are fixed.
 #' @param lifespan lifespan; smaller lifespan = more noise 
-#' @param ss ss
 #' @param max_scientists_per_q max_scientists_per_q
 #' @param startup_cost startup_cost
 #' @param sample_cost sample_cost
@@ -26,8 +25,11 @@ NULL
 #' @param b_neg b_neg
 #' @param abandon_prob abandon_prob
 #' @param num_scientists num_scientists
-#' @param min_sample_size min_sample_size
-#' @param max_sample_size max_sample_size
+#' @param ss fixed sample size
+#' @param min_sample_size min_sample_size for when sample
+#' sizes are drawn from distribution
+#' @param max_sample_size max_sample_size for when sample
+#' sizes are drawn from distribution
 #' @import pwr
 #' @import assertthat
 #' @return
@@ -36,7 +38,7 @@ NULL
 play_complexcomp <-
   function(evolution,
            lifespan,
-           ss,
+           num_scientists,
            max_scientists_per_q,
            startup_cost,
            sample_cost,
@@ -44,19 +46,24 @@ play_complexcomp <-
            decay,
            b_neg,
            abandon_prob,
-           num_scientists,
+           ss,
            min_sample_size,
            max_sample_size) {
     
  ##### Assert inputs as sanity check #####
       lifespan %>%
-        assert_is_numeric() %>%
+        assert_all_are_whole_numbers() %>%
         assert_all_are_greater_than_or_equal_to(500) %>% 
         assert_all_are_less_than_or_equal_to(50000)
     
       evolution %>%
           assert_is_a_bool()
-    
+      
+      max_scientists_per_q %>%
+          assert_all_are_whole_numbers() %>%
+          assert_all_are_greater_than(0)
+        
+
 
   ##### Set the initial parameters before the loop #####
    

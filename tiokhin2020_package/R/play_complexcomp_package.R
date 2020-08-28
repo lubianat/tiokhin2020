@@ -62,6 +62,27 @@ play_complexcomp <-
       max_scientists_per_q %>%
           assert_all_are_whole_numbers() %>%
           assert_all_are_greater_than(0)
+      
+      num_scientists %>%
+          assert_all_are_divisible_by(max_scientists_per_q)
+      
+      startup_cost %>%
+        assert_all_are_whole_numbers() %>%
+        assert_all_are_greater_than(0)
+      
+      sample_cost %>%
+        assert_all_are_whole_numbers() %>%
+        assert_all_are_greater_than(0)
+      
+      # Syntax influences warning messages in assertthat package.
+      # Behavior is the same as: 
+      # 'sample_cost %>% assert_are_identical(1, severity = "warning")'
+      assert_are_identical(sample_cost, 1, severity = "warning")
+      
+      
+        
+      
+        
         
 
 

@@ -79,7 +79,10 @@ play_complexcomp <-
       # 'sample_cost %>% assert_are_identical(1, severity = "warning")'
       assert_are_identical(sample_cost, 1, severity = "warning")
       
-      
+      exp_rate %>%
+        assert_all_are_whole_numbers() %>%
+        assert_all_are_greater_than_or_equal_to(1) %>%
+        assert_all_are_less_than_or_equal_to(20)
         
       
         

@@ -233,14 +233,17 @@ A good practice is to "sanitize" user inputs: check if they are within reasonabl
 
 I will implement it ussing the [assertthat package](https://cran.r-project.org/web/packages/assertthat/index.html). 
 
+Notes:
 
-evolution : Originally, should be 1 or 0.  I will change it for a boolean argument (TRUE or FALSE) which is slightly better (but see note on Step 0 about boolean arguments).
+evolution : Originally, should be 1 or 0.  I've changed it for a boolean argument (TRUE or FALSE) which is slightly better (but see note on Step 0 about boolean arguments).
 
+lifespan : I set it as  a minimum of 500 and a maximum of 50 000.
 
-lifespan : Positive integer. Let's set  a minimum of 500 and a maximum of 50 000 as reasonable max and minimum. 
+num_scientists : I set it as required to be divisible by max_scientists_per_q.
 
+exp_rate : I've set it as miminum of 1 and maximum of 20.
 
-
+sample_costs : The code throws a warning when different than 1.
 
 
 ### Actual problems

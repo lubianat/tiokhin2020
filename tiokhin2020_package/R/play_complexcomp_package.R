@@ -29,7 +29,7 @@ NULL
 #' @param min_sample_size min_sample_size
 #' @param max_sample_size max_sample_size
 #' @import pwr
-#' @import assertive
+#' @import assertthat
 #' @return
 #' @export
 #'
@@ -49,6 +49,10 @@ play_complexcomp <-
            max_sample_size) {
     
  ##### Assert inputs as sanity check #####
+      lifespan %>%
+        assert_is_numeric() %>%
+        assert_all_are_greater_than_or_equal_to(500) %>% 
+        assert_all_are_less_than_or_equal_to(50000)
     
 
   ##### Set the initial parameters before the loop #####

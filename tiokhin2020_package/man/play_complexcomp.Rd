@@ -23,7 +23,7 @@ play_complexcomp(
 \arguments{
 \item{evolution}{evolution}
 
-\item{lifespan}{lifespan}
+\item{lifespan}{lifespan; smaller lifespan = more noise}
 
 \item{ss}{ss}
 

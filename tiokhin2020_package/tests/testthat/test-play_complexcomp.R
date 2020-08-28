@@ -1,4 +1,3 @@
-library(tiokhin2020)
 context("integration_test")
 
 

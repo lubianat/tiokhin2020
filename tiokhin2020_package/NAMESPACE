@@ -2,9 +2,11 @@
 
 export(play_complexcomp)
 import(RColorBrewer)
+import(assertive)
 import(dplyr)
 import(fastmatch)
 import(ggplot2)
+import(magrittr)
 import(plyr)
 import(profvis)
 import(pwr)

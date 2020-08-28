@@ -173,6 +173,18 @@ The abstractions and the syntax to do it, however, are more complex and take mor
 They would make the code much more readable and testable, but I'm afraid we don't have the time to do
 that big of a change.
 
+## Avoid boolean arguments 
+
+evolution parameter requires 0 or 1. This is an example of a Boolean argument.
+
+“Boolean arguments loudly declare that the function does more than one thing. They are confusing and should be eliminated.”
+
+— Clean Code, Robert C. Martin (Uncle Bob)
+
+More on why they shouldn't be used [here](https://understandlegacycode.com/blog/what-is-wrong-with-boolean-parameters/).
+
+I'll leave it there for simplicity. 
+
 
 # Step 1: 
 
@@ -221,7 +233,11 @@ A good practice is to "sanitize" user inputs: check if they are within reasonabl
 
 I will implement it ussing the [assertthat package](https://cran.r-project.org/web/packages/assertthat/index.html). 
 
-lifespan : Positive integer. Lets set  a minimum of 500 and a maximum of 50 000 as reasonable max and minimum. 
+
+evolution : Should be 0 or 1. (See note on Step 0 about boolean arguments).
+
+
+lifespan : Positive integer. Let's set  a minimum of 500 and a maximum of 50 000 as reasonable max and minimum. 
 
 
 

@@ -245,7 +245,7 @@ exp_rate : I've set it as miminum of 1 and maximum of 20.
 
 sample_costs : The code throws a warning when different than 1.
 
-decay: I've set it to minimum 0 and maximum 20 
+decay : I've set it to minimum 0 and maximum 20 
 
 ### Actual problems
 

@@ -79,16 +79,22 @@ play_complexcomp <-
       # 'sample_cost %>% assert_are_identical(1, severity = "warning")'
       assert_are_identical(sample_cost, 1, severity = "warning")
       
-      exp_rate %>%
+      exp_shape %>%
         assert_all_are_whole_numbers() %>%
         assert_all_are_greater_than_or_equal_to(1) %>%
         assert_all_are_less_than_or_equal_to(20)
         
+      decay %>%
+        assert_is_numeric() %>%
+        assert_all_are_greater_than_or_equal_to(0) %>%
+        assert_all_are_less_than_or_equal_to(20)
       
+      b_neg %>%
+        assert_is_a_number() %>%
+        assert_all_are_greater_than_or_equal_to(0) %>%
+        assert_all_are_less_than_or_equal_to(1)
         
         
-
-
   ##### Set the initial parameters before the loop #####
    
     scientist_df <- build_initial_scientists_df(evolution,

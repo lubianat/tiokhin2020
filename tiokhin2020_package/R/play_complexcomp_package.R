@@ -15,7 +15,7 @@ NULL
 #' Function to play scientists against one another,
 #' including measure of number of scoops
 #'
-#' @param evolution evolution
+#' @param evolution A boolean. When set to TRUE, sample sizes are fixed.
 #' @param lifespan lifespan; smaller lifespan = more noise 
 #' @param ss ss
 #' @param max_scientists_per_q max_scientists_per_q
@@ -53,6 +53,9 @@ play_complexcomp <-
         assert_is_numeric() %>%
         assert_all_are_greater_than_or_equal_to(500) %>% 
         assert_all_are_less_than_or_equal_to(50000)
+    
+      evolution %>%
+          assert_is_a_bool()
     
 
   ##### Set the initial parameters before the loop #####
@@ -258,7 +261,7 @@ get_sample_sizes <-
            num_scientists,
            min_sample_size,
            max_sample_size) {
-    if (evolution == 1) {
+    if (evolution == TRUE) {
       samplesizes <- ss
     } else {
       samplesizes <-

@@ -5,7 +5,7 @@ data("base_sim")
 
 test_that("play_complexcomp works", {
   set.seed(3)
-  evolution = 0
+  evolution = FALSE
   lifespan = 15000
   ss = NA
   max_scientists_per_q = 120

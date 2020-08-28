@@ -234,10 +234,12 @@ A good practice is to "sanitize" user inputs: check if they are within reasonabl
 I will implement it ussing the [assertthat package](https://cran.r-project.org/web/packages/assertthat/index.html). 
 
 
-evolution : Should be 0 or 1. (See note on Step 0 about boolean arguments).
+evolution : Originally, should be 1 or 0.  I will change it for a boolean argument (TRUE or FALSE) which is slightly better (but see note on Step 0 about boolean arguments).
 
 
 lifespan : Positive integer. Let's set  a minimum of 500 and a maximum of 50 000 as reasonable max and minimum. 
+
+
 
 
 

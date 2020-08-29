@@ -10,6 +10,8 @@
 #' @importFrom stats rexp runif
 NULL
 
+# Main function ----
+
 #' play_complexcomp
 #'
 #' Function to play scientists against one another,
@@ -326,6 +328,7 @@ play_complexcomp <-
     return(list(scientist_df))
   }
 
+# Auxiliary functions ----
 
 get_sample_sizes <-
   function(evolution,

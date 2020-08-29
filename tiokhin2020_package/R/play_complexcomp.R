@@ -18,20 +18,25 @@ NULL
 #' including measure of number of scoops
 #'
 #' @param evolution A boolean. When set to TRUE, sample sizes are fixed.
-#' @param lifespan lifespan; smaller lifespan = more noise
-#' @param max_scientists_per_q max_scientists_per_q
-#' @param startup_cost startup_cost
-#' @param sample_cost sample_cost
-#' @param exp_shape exp_shape
-#' @param decay decay
-#' @param b_neg b_neg
-#' @param abandon_prob abandon_prob
-#' @param num_scientists num_scientists
-#' @param ss fixed sample size
+#' @param lifespan Lifespan of scientist's careers. Smaller lifespan leads 
+#'   to more noise.
+#' @param max_scientists_per_q Maximum number of scientists that can pursue
+#'   a question at the same time.
+#' @param startup_cost The time cost of starting a new research project
+#' @param sample_cost The time cost per sample in the experiment
+#' @param exp_shape The shape of the exponential distribution from which
+#'   sample sizes are drawn. 
+#' @param decay A proxy for the decay in novelty when studying a question 
+#'   that has been answered before.
+#' @param b_neg The proportion of payoff awarded for negative results
+#' @param abandon_prob The probability of a scientist dropping a question 
+#'   after being scooped.
+#' @param num_scientists The total number of scientist of the simulation
+#' @param ss A fixed sample size, for when evolution is set to TRUE 
 #' @param min_sample_size min_sample_size for when sample
-#' sizes are drawn from distribution
+#'   sizes are drawn from a distribution
 #' @param max_sample_size max_sample_size for when sample
-#' sizes are drawn from distribution
+#'   sizes are drawn from a distribution
 #' @import pwr
 #' @import assertive
 #' @return

@@ -22,21 +22,21 @@ NULL
 #'   to more noise.
 #' @param max_scientists_per_q Maximum number of scientists that can pursue
 #'   a question at the same time.
-#' @param startup_cost The time cost of starting a new research project
-#' @param sample_cost The time cost per sample in the experiment
+#' @param startup_cost The time cost of starting a new research project.
+#' @param sample_cost The time cost per sample in the experiment.
 #' @param exp_shape The shape of the exponential distribution from which
 #'   sample sizes are drawn. 
 #' @param decay A proxy for the decay in novelty when studying a question 
 #'   that has been answered before.
-#' @param b_neg The proportion of payoff awarded for negative results
+#' @param b_neg The proportion of payoff awarded for negative results.
 #' @param abandon_prob The probability of a scientist dropping a question 
 #'   after being scooped.
 #' @param num_scientists The total number of scientist of the simulation
-#' @param ss A fixed sample size, for when evolution is set to TRUE 
-#' @param min_sample_size min_sample_size for when sample
-#'   sizes are drawn from a distribution
-#' @param max_sample_size max_sample_size for when sample
-#'   sizes are drawn from a distribution
+#' @param ss A fixed sample size, for when evolution is set to TRUE .
+#' @param min_sample_size min_sample_size for when sample sizes are
+#'   drawn from a distribution.
+#' @param max_sample_size max_sample_size for when sample sizes are
+#'   drawn from a distribution.
 #' @import pwr
 #' @import assertive
 #' @return

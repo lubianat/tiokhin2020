@@ -50,7 +50,7 @@ play_complexcomp <-
            min_sample_size,
            max_sample_size) {
 
-    ##### Assert inputs as sanity check #####
+    # Assert inputs as sanity check ----
     lifespan %>%
       assert_all_are_whole_numbers() %>%
       assert_all_are_greater_than_or_equal_to(500) %>%
@@ -94,8 +94,15 @@ play_complexcomp <-
       assert_all_are_greater_than_or_equal_to(0) %>%
       assert_all_are_less_than_or_equal_to(1)
 
-
-    ##### Set the initial parameters before the loop #####
+    min_sample_size %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than(0)
+    
+    max_sample_size  %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than(0)
+    
+    # Set the initial parameters before the loop ----
 
     scientist_df <- build_initial_scientists_df(
       evolution,
@@ -138,11 +145,11 @@ play_complexcomp <-
     previously_published_questions <- vector()
     results_tracker_old <- 0
 
-    ##### Start the simulation  #####
+    # Start the simulation ----
 
     while (current_time_period < lifespan) {
 
-      ##### Set up time-related parameters #####
+      # Set up time-related parameters ----
 
       time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
       time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
@@ -152,7 +159,7 @@ play_complexcomp <-
         break
       }
 
-      ##### Run round for scientist who are testing questions (testers) #####
+      # Run round for scientist who are testing questions (testers) ----
 
       testers_ids <- get_tester_ids(scientist_df, time_cost_for_each_question)
       number_of_testers <- length(testers_ids)
@@ -215,7 +222,7 @@ play_complexcomp <-
       scientists_per_question <-
         get_scientists_per_question(number_of_questions, scientist_df)
 
-      ##### Move testers forward #####
+      # Move testers forward ----
 
       for (i in 1:number_of_testers) {
         next_question <- get_next_question(
@@ -242,7 +249,7 @@ play_complexcomp <-
         time_cost_for_each_question_at_baseline
       )
 
-      ##### Deal with scientists that have been scooped #####
+      # Deal with scientists that have been scooped ----
 
       ids_for_scooped_scientists <- get_scooped_scientists(scientist_df, questions_they_are_working_on, testers_ids)
       number_of_scooped_scientists <- length(ids_for_scooped_scientists)

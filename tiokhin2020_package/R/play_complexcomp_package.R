@@ -16,7 +16,7 @@ NULL
 #' including measure of number of scoops
 #'
 #' @param evolution A boolean. When set to TRUE, sample sizes are fixed.
-#' @param lifespan lifespan; smaller lifespan = more noise 
+#' @param lifespan lifespan; smaller lifespan = more noise
 #' @param max_scientists_per_q max_scientists_per_q
 #' @param startup_cost startup_cost
 #' @param sample_cost sample_cost
@@ -49,138 +49,154 @@ play_complexcomp <-
            ss,
            min_sample_size,
            max_sample_size) {
-    
- ##### Assert inputs as sanity check #####
-      lifespan %>%
-        assert_all_are_whole_numbers() %>%
-        assert_all_are_greater_than_or_equal_to(500) %>% 
-        assert_all_are_less_than_or_equal_to(50000)
-    
-      evolution %>%
-          assert_is_a_bool()
-      
-      max_scientists_per_q %>%
-          assert_all_are_whole_numbers() %>%
-          assert_all_are_greater_than(0)
-      
-      num_scientists %>%
-          assert_all_are_divisible_by(max_scientists_per_q)
-      
-      startup_cost %>%
-        assert_all_are_whole_numbers() %>%
-        assert_all_are_greater_than(0)
-      
-      sample_cost %>%
-        assert_all_are_whole_numbers() %>%
-        assert_all_are_greater_than(0)
-      
-      # Syntax influences warning messages in assertthat package.
-      # Behavior is the same as: 
-      # 'sample_cost %>% assert_are_identical(1, severity = "warning")'
-      assert_are_identical(sample_cost, 1, severity = "warning")
-      
-      exp_shape %>%
-        assert_all_are_whole_numbers() %>%
-        assert_all_are_greater_than_or_equal_to(1) %>%
-        assert_all_are_less_than_or_equal_to(20)
-        
-      decay %>%
-        assert_is_numeric() %>%
-        assert_all_are_greater_than_or_equal_to(0) %>%
-        assert_all_are_less_than_or_equal_to(20)
-      
-      b_neg %>%
-        assert_is_a_number() %>%
-        assert_all_are_greater_than_or_equal_to(0) %>%
-        assert_all_are_less_than_or_equal_to(1)
-        
-        
-  ##### Set the initial parameters before the loop #####
-   
-    scientist_df <- build_initial_scientists_df(evolution,
-                                ss,
-                                num_scientists,
-                                min_sample_size,
-                                max_sample_size,
-                                abandon_prob,
-                                lifespan,
-                                startup_cost,
-                                max_scientists_per_q)
-    
-    number_of_questions <- get_number_of_questions(lifespan, 
-                                                   startup_cost, 
-                                                   num_scientists)
-    
+
+    ##### Assert inputs as sanity check #####
+    lifespan %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than_or_equal_to(500) %>%
+      assert_all_are_less_than_or_equal_to(50000)
+
+    evolution %>%
+      assert_is_a_bool()
+
+    max_scientists_per_q %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than(0)
+
+    num_scientists %>%
+      assert_all_are_divisible_by(max_scientists_per_q)
+
+    startup_cost %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than(0)
+
+    sample_cost %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than(0)
+
+    # Syntax influences warning messages in assertthat package.
+    # Behavior is the same as:
+    # 'sample_cost %>% assert_are_identical(1, severity = "warning")'
+    assert_are_identical(sample_cost, 1, severity = "warning")
+
+    exp_shape %>%
+      assert_all_are_whole_numbers() %>%
+      assert_all_are_greater_than_or_equal_to(1) %>%
+      assert_all_are_less_than_or_equal_to(20)
+
+    decay %>%
+      assert_is_numeric() %>%
+      assert_all_are_greater_than_or_equal_to(0) %>%
+      assert_all_are_less_than_or_equal_to(20)
+
+    b_neg %>%
+      assert_is_a_number() %>%
+      assert_all_are_greater_than_or_equal_to(0) %>%
+      assert_all_are_less_than_or_equal_to(1)
+
+
+    ##### Set the initial parameters before the loop #####
+
+    scientist_df <- build_initial_scientists_df(
+      evolution,
+      ss,
+      num_scientists,
+      min_sample_size,
+      max_sample_size,
+      abandon_prob,
+      lifespan,
+      startup_cost,
+      max_scientists_per_q
+    )
+
+    number_of_questions <- get_number_of_questions(
+      lifespan,
+      startup_cost,
+      num_scientists
+    )
+
     ids_for_questions <- get_question_ids(number_of_questions)
-    questions_e_size <- get_questions_effect_size(number_of_questions,
-                                             exp_shape)
+    questions_e_size <- get_questions_effect_size(
+      number_of_questions,
+      exp_shape
+    )
 
-    results_matrix <- get_results_matrix(number_of_questions,
-                                         max_scientists_per_q)
-    
+    results_matrix <- get_results_matrix(
+      number_of_questions,
+      max_scientists_per_q
+    )
 
-    time_cost_for_each_question <- get_time_cost_for_each_question(scientist_df,
-                                                                   sample_cost,
-                                                                   startup_cost)
+
+    time_cost_for_each_question <- get_time_cost_for_each_question(
+      scientist_df,
+      sample_cost,
+      startup_cost
+    )
     time_cost_for_each_question_at_baseline <- time_cost_for_each_question
-   
+
     current_time_period <- 1
     previously_published_questions <- vector()
     results_tracker_old <- 0
-    
-  ##### Start the simulation  #####
-    
+
+    ##### Start the simulation  #####
+
     while (current_time_period < lifespan) {
-      
+
       ##### Set up time-related parameters #####
-      
+
       time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
       time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
       current_time_period <- current_time_period + time_to_next_event
-      
+
       if (current_time_period >= lifespan) {
         break
       }
-      
+
       ##### Run round for scientist who are testing questions (testers) #####
-      
+
       testers_ids <- get_tester_ids(scientist_df, time_cost_for_each_question)
       number_of_testers <- length(testers_ids)
-      
-     questions_they_are_working_on <-
+
+      questions_they_are_working_on <-
         get_questions_they_are_working_on(scientist_df, testers_ids)
-     
+
       sample_size_of_testers <- scientist_df$ss[testers_ids]
-      
+
       powers <-
-        get_t_test_powers(sample_size_of_testers,
-                          questions_e_size,
-                          questions_they_are_working_on)
-      
+        get_t_test_powers(
+          sample_size_of_testers,
+          questions_e_size,
+          questions_they_are_working_on
+        )
+
       results_scientists_got <-
         check_results_scientists_got(number_of_testers, powers)
-      
-      scientist_df <- calculate_and_deliver_payoffs(number_of_testers,
-                                    previously_published_questions,
-                                    questions_they_are_working_on,
-                                    i,
-                                    decay,
-                                    results_scientists_got,
-                                    b_neg,
-                                    scientist_df,
-                                    testers_ids)
-      
+
+      scientist_df <- calculate_and_deliver_payoffs(
+        number_of_testers,
+        previously_published_questions,
+        questions_they_are_working_on,
+        i,
+        decay,
+        results_scientists_got,
+        b_neg,
+        scientist_df,
+        testers_ids
+      )
+
       previously_published_questions <-
-        c(previously_published_questions,
-          questions_they_are_working_on)
-      
+        c(
+          previously_published_questions,
+          questions_they_are_working_on
+        )
+
       results_tracker_new <-
         results_tracker_old + number_of_testers
-      
-      
+
+
       indexes_to_update <-
         (results_tracker_old + 1):results_tracker_new
-      
+
       set_of_results <-
         c(
           questions_they_are_working_on,
@@ -188,19 +204,19 @@ play_complexcomp <-
           sample_size_of_testers,
           results_scientists_got
         )
-      results_matrix[indexes_to_update,] <- set_of_results
-      
+      results_matrix[indexes_to_update, ] <- set_of_results
+
       largest_question_id_available <-
         max(scientist_df$question) + number_of_testers
-  
+
       max_previously_published_question <-
         max(previously_published_questions)
-      
+
       scientists_per_question <-
         get_scientists_per_question(number_of_questions, scientist_df)
-      
+
       ##### Move testers forward #####
-      
+
       for (i in 1:number_of_testers) {
         next_question <- get_next_question(
           scientists_per_question,
@@ -210,82 +226,94 @@ play_complexcomp <-
           max_previously_published_question
         )
 
-        
+
         scientists_per_question <- update_scientists_per_question(scientists_per_question,
-                                                                  question_to_abandon=questions_they_are_working_on,
-                                                                  question_to_go_to=next_question )
-        
-        scientist_df$question[testers_ids[i]] <-    next_question 
+          question_to_abandon = questions_they_are_working_on,
+          question_to_go_to = next_question
+        )
+
+        scientist_df$question[testers_ids[i]] <- next_question
       }
-      
-      
-      time_cost_for_each_question <- reset_time_cost_for_testers(time_cost_for_each_question,
-                                                                 testers_ids,
-                                                                 time_cost_for_each_question_at_baseline) 
+
+
+      time_cost_for_each_question <- reset_time_cost_for_testers(
+        time_cost_for_each_question,
+        testers_ids,
+        time_cost_for_each_question_at_baseline
+      )
 
       ##### Deal with scientists that have been scooped #####
-      
+
       ids_for_scooped_scientists <- get_scooped_scientists(scientist_df, questions_they_are_working_on, testers_ids)
       number_of_scooped_scientists <- length(ids_for_scooped_scientists)
-      
+
       largest_question_for_scooped_scientists <-
         largest_question_id_available + number_of_scooped_scientists
-      
+
       if (number_of_scooped_scientists > 0) {
-        
         for (i in 1:number_of_scooped_scientists) {
-          
-          question_of_scooped_scientist <- get_question_of_scooped_scientist(scientist_df,
-                                                                            ids_for_scooped_scientists,
-                                                                            i)
+          question_of_scooped_scientist <- get_question_of_scooped_scientist(
+            scientist_df,
+            ids_for_scooped_scientists,
+            i
+          )
 
-          scooper_ids <- get_scooper_of_this_scientist(testers_ids,
-                                                      questions_they_are_working_on,
-                                                      question_of_scooped_scientist)
-          
-          scoopers_questions = get_scooper_questions(scientist_df, scooper_ids)
+          scooper_ids <- get_scooper_of_this_scientist(
+            testers_ids,
+            questions_they_are_working_on,
+            question_of_scooped_scientist
+          )
 
-          max_of_scoopers_questions <-   max(scoopers_questions)
-          
-          scientist_gives_up <- test_probabilistically_if_scientist_gives_up(scooper_ids,
-                                                                             scientist_df,
-                                                                             ids_for_scooped_scientists,
-                                                                             i)
-          
+          scoopers_questions <- get_scooper_questions(scientist_df, scooper_ids)
+
+          max_of_scoopers_questions <- max(scoopers_questions)
+
+          scientist_gives_up <- test_probabilistically_if_scientist_gives_up(
+            scooper_ids,
+            scientist_df,
+            ids_for_scooped_scientists,
+            i
+          )
+
           ##### Moved scooped scientists to next question #####
           if (scientist_gives_up) {
+            first_question_available <- make_checks_and_get_first_question_available(
+              scientists_per_question,
+              largest_question_for_scooped_scientists,
+              max_scientists_per_q,
+              ids_for_questions,
+              max_of_scoopers_questions
+            )
 
-            first_question_available <- make_checks_and_get_first_question_available(scientists_per_question,
-                                                                                     largest_question_for_scooped_scientists,
-                                                                                     max_scientists_per_q,
-                                                                                     ids_for_questions,
-                                                                                     max_of_scoopers_questions)
-              
-            scientists_per_question <- update_scientists_per_question(scientists_per_question,
-                                                                      question_of_scooped_scientist,
-                                                                      first_question_available)
-            
+            scientists_per_question <- update_scientists_per_question(
+              scientists_per_question,
+              question_of_scooped_scientist,
+              first_question_available
+            )
 
-            scientist_df <- move_scientist_to_new_question(scientist_df,
-                                           ids_for_scooped_scientists,
-                                           i,
-                                           first_question_available)
 
-            time_cost_for_each_question <- reset_time_cost_for_scooped_scientists_that_changed_question(time_cost_for_each_question, 
-                                                                                                        ids_for_scooped_scientists, 
-                                                                                                        i,
-                                                                                                        time_cost_for_each_question_at_baseline)
-              
+            scientist_df <- move_scientist_to_new_question(
+              scientist_df,
+              ids_for_scooped_scientists,
+              i,
+              first_question_available
+            )
+
+            time_cost_for_each_question <- reset_time_cost_for_scooped_scientists_that_changed_question(
+              time_cost_for_each_question,
+              ids_for_scooped_scientists,
+              i,
+              time_cost_for_each_question_at_baseline
+            )
           }
         }
       }
-      
+
       results_tracker_old <- results_tracker_new
-      
     }
-    
+
     results_df <-
-      as.data.frame(results_matrix[1:results_tracker_old,])
+      as.data.frame(results_matrix[1:results_tracker_old, ])
     results_df$esize <-
       questions_e_size[match(results_df$q_id, ids_for_questions)]
     return(list(scientist_df))
@@ -410,7 +438,7 @@ calculate_payoff <-
            b_neg) {
     if (results_scientists_got[i]) {
       payoff <- novelty_of_result
-    } else{
+    } else {
       payoff <- novelty_of_result * b_neg
     }
   }
@@ -423,7 +451,7 @@ count_all_prior_published_results_for_questions <-
   }
 
 calculate_novelty <- function(num_prior, decay) {
-  (1 / (1 + num_prior)) ^ decay
+  (1 / (1 + num_prior))^decay
 }
 
 add_payoff_to_that_tester <-
@@ -477,7 +505,7 @@ get_scooper_questions <- function(scientist_df, scooper_ids) {
 
 test_probabilistically_if_scientist_gives_up <- function(scooper_ids, scientist_df, ids_for_scooped_scientists, i) {
   number_of_publications_of_scooped_question <- length(scooper_ids)
-  
+
   any(runif(number_of_publications_of_scooped_question, 0, 1) < scientist_df$abandon_prob[ids_for_scooped_scientists[i]])
 }
 
@@ -489,15 +517,15 @@ check_which_questions_have_not_been_taken_by_scoopers <- function(ids_for_questi
   ids_for_questions[1:largest_question_for_scooped_scientists] > max_of_scoopers_questions
 }
 
-update_scientists_per_question <- function(scientists_per_question, 
+update_scientists_per_question <- function(scientists_per_question,
                                            question_to_abandon,
                                            question_to_go_to) {
   scientists_per_question[question_to_abandon] <-
     scientists_per_question[question_to_abandon] - 1
-  
+
   scientists_per_question[question_to_go_to] <-
     scientists_per_question[question_to_go_to] + 1
-  
+
   scientists_per_question
 }
 
@@ -518,34 +546,42 @@ reset_time_cost_for_scooped_scientists_that_changed_question <- function(time_co
 }
 
 build_initial_scientists_df <- function(evolution, ss, num_scientists, min_sample_size, max_sample_size, abandon_prob, lifespan, startup_cost, max_scientists_per_q) {
-  sample_sizes <- get_sample_sizes(evolution,
-                                   ss, 
-                                   num_scientists,
-                                   min_sample_size, 
-                                   max_sample_size)
-  
+  sample_sizes <- get_sample_sizes(
+    evolution,
+    ss,
+    num_scientists,
+    min_sample_size,
+    max_sample_size
+  )
+
   ids_for_scientists <- get_ids_for_scientists(sample_sizes)
-  
+
   initial_payoffs <- get_initial_payoffs(sample_sizes)
-  
-  scientist_df <- get_scientists_data_frame(ids_for_scientists,
-                                            sample_sizes,
-                                            abandon_prob,
-                                            initial_payoffs,
-                                            num_scientists)
-  
-  number_of_questions <- get_number_of_questions(lifespan, 
-                                                 startup_cost, 
-                                                 num_scientists)
-  
+
+  scientist_df <- get_scientists_data_frame(
+    ids_for_scientists,
+    sample_sizes,
+    abandon_prob,
+    initial_payoffs,
+    num_scientists
+  )
+
+  number_of_questions <- get_number_of_questions(
+    lifespan,
+    startup_cost,
+    num_scientists
+  )
+
   ids_for_questions <- get_question_ids(number_of_questions)
-  
-  
+
+
   scientist_df <-
-    assign_scientists_to_questions(scientist_df,
-                                   ids_for_questions,
-                                   max_scientists_per_q,
-                                   ids_for_scientists)
+    assign_scientists_to_questions(
+      scientist_df,
+      ids_for_questions,
+      max_scientists_per_q,
+      ids_for_scientists
+    )
 }
 
 get_time_cost_for_each_question <- function(scientist_df, sample_cost, startup_cost) {
@@ -560,20 +596,22 @@ get_time_to_next_event <- function(time_cost_for_each_question, lifespan, curren
 
 calculate_and_deliver_payoffs <- function(number_of_testers, previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids) {
   for (i in 1:number_of_testers) {
-    scientist_df <-  calculate_and_deliver_payoff(previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids)
+    scientist_df <- calculate_and_deliver_payoff(previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids)
   }
   return(scientist_df)
 }
 
 calculate_and_deliver_payoff <- function(previously_published_questions, questions_they_are_working_on, i, decay, results_scientists_got, b_neg, scientist_df, testers_ids) {
   num_prior <-
-    count_all_prior_published_results_for_questions(previously_published_questions,
-                                                    questions_they_are_working_on,
-                                                    i)
+    count_all_prior_published_results_for_questions(
+      previously_published_questions,
+      questions_they_are_working_on,
+      i
+    )
   novelty_of_result <- calculate_novelty(num_prior, decay)
   payoff <-
     calculate_payoff(results_scientists_got, i, novelty_of_result, b_neg)
-  
+
   scientist_df <-
     add_payoff_to_that_tester(scientist_df, testers_ids, i, payoff)
   return(scientist_df)
@@ -581,10 +619,10 @@ calculate_and_deliver_payoff <- function(previously_published_questions, questio
 
 make_checks_and_get_first_question_available <- function(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q, ids_for_questions, max_of_scoopers_questions) {
   checker_for_questions_not_full <- check_if_questions_are_not_full(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q)
-  
+
   checker_for_questions_not_taken_by_scoopers <- check_which_questions_have_not_been_taken_by_scoopers(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions)
-  
+
   checker_for_questions_available <- checker_for_questions_not_full & checker_for_questions_not_taken_by_scoopers
-  
+
   first_question_available <- get_first_question_available(checker_for_questions_available)
 }

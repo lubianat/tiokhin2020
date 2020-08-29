@@ -1,8 +1,8 @@
 #' run_complexsim
 #'
 #' Function to run complex simulation
-#' 
-#'  
+#'
+#'
 #' @param lifespan life of 1 generation of scientists
 #' @param max_scientists_per_q number of competitors
 #' @param generations number of generations
@@ -15,7 +15,7 @@
 #' @param num_scientists num_scientists
 #' @param min_sample_size min_sample_size
 #' @param max_sample_size max_sample_size
-#' 
+#'
 #' @return
 run_complexsim <- function(lifespan,
                            max_scientists_per_q,
@@ -25,22 +25,21 @@ run_complexsim <- function(lifespan,
                            sample_costs,
                            exp_rate,
                            scooped_decay,
-                           payoff_to_being_second, 
+                           payoff_to_being_second,
                            num_scientists,
                            min_sample_size,
                            max_sample_size) {
-  
-  lifespan <- lifespan 
+  lifespan <- lifespan
   popsize <- num_scientists
   max_per_q <- max_scientists_per_q
-  gens <- generations 
-  repeats <- simulation_repeats 
+  gens <- generations
+  repeats <- simulation_repeats
   startup_costs <- startup_costs
   sample_costs <- sample_costs
   exp_rate <- exp_rate
   decay <- scooped_decay
   b_neg <- payoff_to_being_second
-  
+
   eq.samplecost <- vector()
   eq.startupcost <- vector()
   eq.exprate <- vector()
@@ -52,70 +51,71 @@ run_complexsim <- function(lifespan,
   eq.abandonprob <- vector()
   eq.life <- vector()
   res_list_all <- list()
-  
+
   single_region <- length(max_per_q) == 1 && length(repeats) == 1 && length(startup_costs) == 1 && length(sample_costs) == 1 &&
     length(exp_rate) == 1 && length(decay) == 1 && length(b_neg) == 1
-  
+
   mean_ss <- rep(0, gens)
   lower_ss <- rep(0, gens)
   upper_ss <- rep(0, gens)
   mean_aban <- rep(0, gens)
   lower_aban <- rep(0, gens)
   upper_aban <- rep(0, gens)
-  
-  #tracker
+
+  # tracker
   zz <- 1
-  
-  for(rate in exp_rate) {
+
+  for (rate in exp_rate) {
     for (sample_cost in sample_costs) {
-      for(startup_cost in startup_costs) {
-        for(comp_n in max_per_q) {
-          for(dcy in decay) {
-            for(bn in b_neg) {
-              
-              #list to store all results across repeats
+      for (startup_cost in startup_costs) {
+        for (comp_n in max_per_q) {
+          for (dcy in decay) {
+            for (bn in b_neg) {
+
+              # list to store all results across repeats
               results_list <- vector("list", repeats)
-              
-              for(rep in 1:repeats) {
-                
-                # initialize the population, for each repeat 
+
+              for (rep in 1:repeats) {
+
+                # initialize the population, for each repeat
                 rounded_popsize <- round(popsize / comp_n) * comp_n
                 ss <- round(runif(rounded_popsize, min_sample_size, max_sample_size))
                 aban <- runif(rounded_popsize, min_aban, max_aban)
-                
+
                 # start looping
                 for (gen in 1:gens) {
-                  
-                  #play scientists against each other
-                  outcome_list <- play_complexcomp(1, lifespan, ss, comp_n, startup_cost, sample_cost, rate, dcy, 
-                                                   bn, aban)
+
+                  # play scientists against each other
+                  outcome_list <- play_complexcomp(
+                    1, lifespan, ss, comp_n, startup_cost, sample_cost, rate, dcy,
+                    bn, aban
+                  )
                   fitness <- outcome_list[[1]]
-                  
+
                   # calculate fitness and manage reproduction
-                  fitness2 <- fitness/sum(fitness)
-                  ss <- sample(ss, size = rounded_popsize, replace=TRUE, prob=fitness2)
-                  ss <- round(ss + rnorm(rounded_popsize, 0, 2)) #change sd to change size of mutations
+                  fitness2 <- fitness / sum(fitness)
+                  ss <- sample(ss, size = rounded_popsize, replace = TRUE, prob = fitness2)
+                  ss <- round(ss + rnorm(rounded_popsize, 0, 2)) # change sd to change size of mutations
                   ss <- pmin(pmax(ss, 2), 1000)
-                  
-                  aban <- sample(aban, size=rounded_popsize, replace=TRUE, prob=fitness2)
-                  aban <- aban + rnorm(rounded_popsize, 0, 0.01) #change sd to change size of mutations
+
+                  aban <- sample(aban, size = rounded_popsize, replace = TRUE, prob = fitness2)
+                  aban <- aban + rnorm(rounded_popsize, 0, 0.01) # change sd to change size of mutations
                   aban <- pmin(pmax(aban, 0), 1)
-                  
-                  #save state of the population sample sizes and abandonment probabilities
+
+                  # save state of the population sample sizes and abandonment probabilities
                   if (single_region) {
                     mean_ss[gen] <- mean_ss[gen] + mean(ss)
                     dum <- quantile(ss, c(0.025, 0.975))
                     lower_ss[gen] <- lower_ss[gen] + dum[[1]]
                     upper_ss[gen] <- upper_ss[gen] + dum[[2]]
-                    
+
                     mean_aban[gen] <- mean_aban[gen] + mean(aban)
                     dum <- quantile(aban, c(0.025, 0.975))
                     lower_aban[gen] <- lower_aban[gen] + dum[[1]]
                     upper_aban[gen] <- upper_aban[gen] + dum[[2]]
                   }
-                  
                 } # end of generation
-                
+
                 eq.samplecost <- c(eq.samplecost, sample_cost)
                 eq.startupcost <- c(eq.startupcost, startup_cost)
                 eq.exprate <- c(eq.exprate, rate)
@@ -127,10 +127,9 @@ run_complexsim <- function(lifespan,
                 eq.abandonprob <- c(eq.abandonprob, mean(aban))
                 eq.life <- c(eq.life, lifespan)
                 results_list[[rep]] <- outcome_list[[2]]
-                
               } # end of repeat
-              
-              #combine results and label df w/ accurate parameters
+
+              # combine results and label df w/ accurate parameters
               eq.result.df <- bind_rows(results_list)
               eq.result.df$eq.samplecost <- sample_cost
               eq.result.df$eq.startupcost <- startup_cost
@@ -139,29 +138,34 @@ run_complexsim <- function(lifespan,
               eq.result.df$eq.maxperq <- comp_n
               eq.result.df$eq.b_neg <- bn
               eq.result.df$eq.life <- lifespan
-              
-              #save eq.results.df after all repeats for one unique combination of paramaters 
-              res_list_all[[length(res_list_all)+1]] <- eq.result.df
-            } 
-            
-            results <- data.frame(eq.samplesize, eq.abandonprob, eq.totalfitness,
-                                  eq.samplecost, eq.startupcost, eq.exprate, eq.decay, eq.maxperq, 
-                                  eq.b_neg, eq.life) 
-            
-            #save objects; 
-            if(single_region == FALSE){
+
+              # save eq.results.df after all repeats for one unique combination of paramaters
+              res_list_all[[length(res_list_all) + 1]] <- eq.result.df
+            }
+
+            results <- data.frame(
+              eq.samplesize, eq.abandonprob, eq.totalfitness,
+              eq.samplecost, eq.startupcost, eq.exprate, eq.decay, eq.maxperq,
+              eq.b_neg, eq.life
+            )
+
+            # save objects;
+            if (single_region == FALSE) {
               save(results, file = "eq_data_sample.RData")
               save(res_list_all, file = "res_list_sample.RData")
-              
-              #update tracker
+
+              # update tracker
               print(paste("parameter combo #", zz))
               zz <- zz + 1
-              
-            } else{
-              return(list(mean_ss, lower_ss, upper_ss, 
-                          mean_aban, lower_aban, upper_aban))
+            } else {
+              return(list(
+                mean_ss, lower_ss, upper_ss,
+                mean_aban, lower_aban, upper_aban
+              ))
             }
-            
-          } } } } } 
+          }
+        }
+      }
+    }
+  }
 }
-

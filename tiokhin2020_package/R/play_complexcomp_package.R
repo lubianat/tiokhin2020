@@ -31,7 +31,7 @@ NULL
 #' @param max_sample_size max_sample_size for when sample
 #' sizes are drawn from distribution
 #' @import pwr
-#' @import assertthat
+#' @import assertive
 #' @return
 #' @export
 #'

@@ -7,7 +7,7 @@
 play_complexcomp(
   evolution,
   lifespan,
-  ss,
+  num_scientists,
   max_scientists_per_q,
   startup_cost,
   sample_cost,
@@ -15,17 +15,17 @@ play_complexcomp(
   decay,
   b_neg,
   abandon_prob,
-  num_scientists,
+  ss,
   min_sample_size,
   max_sample_size
 )
 }
 \arguments{
-\item{evolution}{evolution}
+\item{evolution}{A boolean. When set to TRUE, sample sizes are fixed.}
 
 \item{lifespan}{lifespan; smaller lifespan = more noise}
 
-\item{ss}{ss}
+\item{num_scientists}{num_scientists}
 
 \item{max_scientists_per_q}{max_scientists_per_q}
 
@@ -41,11 +41,13 @@ play_complexcomp(
 
 \item{abandon_prob}{abandon_prob}
 
-\item{num_scientists}{num_scientists}
+\item{ss}{fixed sample size}
 
-\item{min_sample_size}{min_sample_size}
+\item{min_sample_size}{min_sample_size for when sample
+sizes are drawn from distribution}
 
-\item{max_sample_size}{max_sample_size}
+\item{max_sample_size}{max_sample_size for when sample
+sizes are drawn from distribution}
 }
 \value{
 

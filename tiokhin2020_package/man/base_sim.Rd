@@ -4,7 +4,9 @@
 \name{base_sim}
 \alias{base_sim}
 \title{Example simulation result}
-\format{A list containing 1 dataframe}
+\format{
+A list containing 1 dataframe
+}
 \usage{
 base_sim
 }

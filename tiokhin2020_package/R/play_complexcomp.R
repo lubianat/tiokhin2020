@@ -18,18 +18,18 @@ NULL
 #' including measure of number of scoops
 #'
 #' @param evolution A boolean. When set to TRUE, sample sizes are fixed.
-#' @param lifespan Lifespan of scientist's careers. Smaller lifespan leads 
+#' @param lifespan Lifespan of scientist's careers. Smaller lifespan leads
 #'   to more noise.
 #' @param max_scientists_per_q Maximum number of scientists that can pursue
 #'   a question at the same time.
 #' @param startup_cost The time cost of starting a new research project.
 #' @param sample_cost The time cost per sample in the experiment.
 #' @param exp_shape The shape of the exponential distribution from which
-#'   sample sizes are drawn. 
-#' @param decay A proxy for the decay in novelty when studying a question 
+#'   sample sizes are drawn.
+#' @param decay A proxy for the decay in novelty when studying a question
 #'   that has been answered before.
 #' @param b_neg The proportion of payoff awarded for negative results.
-#' @param abandon_prob The probability of a scientist dropping a question 
+#' @param abandon_prob The probability of a scientist dropping a question
 #'   after being scooped.
 #' @param num_scientists The total number of scientist of the simulation
 #' @param ss A fixed sample size, for when evolution is set to TRUE .
@@ -58,11 +58,11 @@ play_complexcomp <-
            max_sample_size) {
 
     # Assert inputs as sanity check ----
-    
+
     startup_cost %>%
       assert_is_subset(c(10, 100, 200, 400))
-    
-    if (startup_cost == 10){
+
+    if (startup_cost == 10) {
       assert_are_identical(lifespan, 5000)
     } else {
       assert_are_identical(lifespan, 15000)
@@ -72,7 +72,7 @@ play_complexcomp <-
       assert_is_a_bool()
 
     max_scientists_per_q %>%
-      assert_is_subset(c(1,2,4,8), severity = "warning")
+      assert_is_subset(c(1, 2, 4, 8), severity = "warning")
 
     # Syntax influences warning messages in assertive package.
     assert_are_identical(sample_cost, 1)
@@ -89,11 +89,11 @@ play_complexcomp <-
     min_sample_size %>%
       assert_all_are_whole_numbers() %>%
       assert_all_are_greater_than(0)
-    
-    max_sample_size  %>%
+
+    max_sample_size %>%
       assert_all_are_whole_numbers() %>%
       assert_all_are_greater_than(0)
-    
+
     # Set the initial parameters before the loop ----
 
     scientist_df <- build_initial_scientists_df(

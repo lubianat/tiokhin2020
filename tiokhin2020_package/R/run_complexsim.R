@@ -11,10 +11,12 @@
 #' @param sample_costs sample_costs
 #' @param exp_rate exp_rate
 #' @param scooped_decay the decay for payoff for a question that has been answered before
-#' @param payoff_to_being_second payoff_to_being_second
+#' @param b_neg payoff for negative result
 #' @param num_scientists num_scientists
 #' @param min_sample_size min_sample_size
 #' @param max_sample_size max_sample_size
+#' @param min_aban min_aban
+#' @param max_aban max_aban
 #'
 #' @return
 run_complexsim <- function(lifespan,
@@ -25,10 +27,12 @@ run_complexsim <- function(lifespan,
                            sample_costs,
                            exp_rate,
                            scooped_decay,
-                           payoff_to_being_second,
+                           b_neg,
                            num_scientists,
                            min_sample_size,
-                           max_sample_size) {
+                           max_sample_size,
+                           min_aban = 0,
+                           max_aban = 1) {
   lifespan <- lifespan
   popsize <- num_scientists
   max_per_q <- max_scientists_per_q
@@ -38,7 +42,7 @@ run_complexsim <- function(lifespan,
   sample_costs <- sample_costs
   exp_rate <- exp_rate
   decay <- scooped_decay
-  b_neg <- payoff_to_being_second
+  b_neg <- b_neg
 
   eq.samplecost <- vector()
   eq.startupcost <- vector()
@@ -86,15 +90,28 @@ run_complexsim <- function(lifespan,
                 for (gen in 1:gens) {
 
                   # play scientists against each other
-                  outcome_list <- play_complexcomp(
-                    1, lifespan, ss, comp_n, startup_cost, sample_cost, rate, dcy,
-                    bn, aban
-                  )
-                  fitness <- outcome_list[[1]]
+                  print(lifespan)
+                  outcome_list <- play_complexcomp(evolution = TRUE, 
+                                                   lifespan = lifespan,
+                                                   num_scientists = popsize,
+                                                   startup_cost = startup_cost,
+                                                   max_scientists_per_q = comp_n,
+                                                   sample_cost = sample_cost,
+                                                   exp_shape = exp_rate, 
+                                                   decay = dcy,
+                                                   b_neg = bn,
+                                                   abandon_prob = aban,
+                                                   min_sample_size = min_sample_size,
+                                                   max_sample_size = max_sample_size,
+                                                   ss = ss)
+                  fitness <- outcome_list[[1]]$payoff
 
                   # calculate fitness and manage reproduction
                   fitness2 <- fitness / sum(fitness)
-                  ss <- sample(ss, size = rounded_popsize, replace = TRUE, prob = fitness2)
+                  ss <- sample(ss,
+                               size = rounded_popsize,
+                               replace = TRUE,
+                               prob = fitness2)
                   ss <- round(ss + rnorm(rounded_popsize, 0, 2)) # change sd to change size of mutations
                   ss <- pmin(pmax(ss, 2), 1000)
 

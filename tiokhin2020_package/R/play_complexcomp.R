@@ -65,7 +65,7 @@ play_complexcomp <-
     if (startup_cost == 10) {
       assert_are_identical(lifespan, 5000)
     } else {
-      assert_are_identical(lifespan, 15000)
+      assert_are_identical(lifespan, 15000, severity = "warning")
     }
 
     evolution %>%
@@ -124,29 +124,34 @@ play_complexcomp <-
       number_of_questions,
       max_scientists_per_q
     )
-
-
+    print(head(scientist_df))
+    print(sample_cost)
+    print(startup_cost)
     time_cost_for_each_question <- get_time_cost_for_each_question(
       scientist_df,
       sample_cost,
       startup_cost
     )
     time_cost_for_each_question_at_baseline <- time_cost_for_each_question
-
+    print(time_cost_for_each_question)
     current_time_period <- 1
     previously_published_questions <- vector()
     results_tracker_old <- 0
 
     # Start the simulation ----
-
+    print(lifespan)
+    print(current_time_period)
+    
     while (current_time_period < lifespan) {
+      print(current_time_period)
 
       # Set up time-related parameters ----
 
       time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
+      print(time_to_next_event)
       time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
       current_time_period <- current_time_period + time_to_next_event
-
+      print(current_time_period)
       if (current_time_period >= lifespan) {
         break
       }

@@ -280,6 +280,16 @@ ensure that the results are reproducible.
 By the stochastic nature of these functions, the original article is, **stricto sensu**, 
 irreparably irreproducible. 
 
+#### 4 
+
+A bit of the run_complexsim.R code was saying `fitness <- outcome_list[[1]]`. However, as per the implementation, this outcome was a dataframe. 
+
+I don't know if there is some issue regarding R-version or anything of such. I changed it to 
+outcome_list[[1]]$payoffs as the sample in new generations are based on payoffs. 
+
+I imagine that on the original code it actually did this, but I have no way to tell. 
+
+
 # Questions 
 
 
@@ -296,4 +306,6 @@ Does everyone really get a payoff regardless of a true or false result?
 #### 3
 
 Are all scientists moved to the SAME second question?
+
+
 

@@ -58,48 +58,33 @@ play_complexcomp <-
            max_sample_size) {
 
     # Assert inputs as sanity check ----
-    lifespan %>%
-      assert_all_are_whole_numbers() %>%
-      assert_all_are_greater_than_or_equal_to(500) %>%
-      assert_all_are_less_than_or_equal_to(50000)
+    
+    startup_cost %>%
+      assert_is_subset(c(10, 100, 200, 400))
+    
+    if (startup_cost == 10){
+      assert_are_identical(lifespan, 5000)
+    } else {
+      assert_are_identical(lifespan, 15000)
+    }
 
     evolution %>%
       assert_is_a_bool()
 
     max_scientists_per_q %>%
-      assert_all_are_whole_numbers() %>%
-      assert_all_are_greater_than(0)
+      assert_is_subset(c(1,2,4,8), severity = "warning")
 
-    num_scientists %>%
-      assert_all_are_divisible_by(max_scientists_per_q)
+    # Syntax influences warning messages in assertive package.
+    assert_are_identical(sample_cost, 1)
+    assert_are_identical(num_scientists, 120)
+    assert_are_identical(exp_shape, 5)
 
-    startup_cost %>%
-      assert_all_are_whole_numbers() %>%
-      assert_all_are_greater_than(0)
-
-    sample_cost %>%
-      assert_all_are_whole_numbers() %>%
-      assert_all_are_greater_than(0)
-
-    # Syntax influences warning messages in assertthat package.
-    # Behavior is the same as:
-    # 'sample_cost %>% assert_are_identical(1, severity = "warning")'
-    assert_are_identical(sample_cost, 1, severity = "warning")
-
-    exp_shape %>%
-      assert_all_are_whole_numbers() %>%
-      assert_all_are_greater_than_or_equal_to(1) %>%
-      assert_all_are_less_than_or_equal_to(20)
 
     decay %>%
-      assert_is_numeric() %>%
-      assert_all_are_greater_than_or_equal_to(0) %>%
-      assert_all_are_less_than_or_equal_to(20)
+      assert_is_subset(c(0, 0.15, 0.40, 1, 10))
 
     b_neg %>%
-      assert_is_a_number() %>%
-      assert_all_are_greater_than_or_equal_to(0) %>%
-      assert_all_are_less_than_or_equal_to(1)
+      assert_is_subset(c(0, 0.25, 0.5, 0.75, 1))
 
     min_sample_size %>%
       assert_all_are_whole_numbers() %>%

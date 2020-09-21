@@ -1,11 +1,14 @@
 
-# Model clains
+# Model clao,s
 
 I will write long reports for some claims, but not for all. 
 
-Notably, I will make it clear whenever I find something 
-strange. So the lack of a report means that it is *quite probably okay*.
+Notably, I will make it clear whenever I find something strange. 
+The lack of a report means that it is *probably okay*.
 
+The snippets here are (except when noted) derived from a revised and cleaned version of the model.
+The logic, however, was not changed in the refactoring process, as far as the established unit tests
+could cover.
 
 ## 01
 
@@ -82,16 +85,17 @@ get_questions_effect_size <- function(number_of_questions, exp_shape) {
 
 - In the dataframe for the models, each scientist get a numeric id: 
 
-`
+```
 get_ids_for_scientists <- function(sample_sizes) {
   1:length(sample_sizes)
 }
+```
 
-`
-
-- In the simulation, there is a parameter for controlling the maximum number of scientists per question. It is used twic.
+- In the simulation, there is a parameter for controlling the maximum number of scientists per question. It is used twice.
     - When moving scientists that published:
-    `get_next_question <-
+    
+```
+get_next_question <-
   function(questions_n_on_q,
            largest_q_avail,
            max_scientists_per_q,
@@ -103,55 +107,251 @@ get_ids_for_scientists <- function(sample_sizes) {
     dum <- dum1 & dum2
     next_q <- match(TRUE, dum)
     return(next_q)
-  }`
-
+  }
+```
     - And when moving scientists that, after scooping, abandoned their previous questions:
-    `check_if_questions_are_not_full <- function(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q) {
+```  
+check_if_questions_are_not_full <- function(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q) {
     scientists_per_question[1:largest_question_for_scooped_scientists] < max_scientists_per_q
-    }`
+    }
+```  
     
 
 ## 06
 * A scientist begins their career on the smallest-numbered open research question (i.e., the smallest numbered question occupied by fewer than m other scientists)
-
+  - That is represented in the code. This is the snipped that deals with it: 
+```
+assign_scientists_to_questions <-
+  function(scientist_df,
+           questions_q_id,
+           max_scientists_per_q,
+           ids_for_scientists) {
+    scientist_df$question[ids_for_scientists] <-
+      rep(questions_q_id, each = max_scientists_per_q)[ids_for_scientists]
+    return(scientist_df)
+  }
+```
+  - The rep function generates "n" repetitions for each question id (where "n" is the max_scientists_per_q parameter). The scientists then get assigned in order to the questions.
+  
+  
+## 07
 * We do this to avoid unrealistic outcomes (e.g., all scientists working on a single question; all scientists working on different questions) 
 
-**This is not true! All scientistists may start on the same question, and that actually happens in (at least) one of the simulations.** 
+- Even though the code does not enforce this constraint (all scientistists could work on the same question) the combination of parameters for that doesn't seem to have been used.
 
 
+
+
+## 08 
 * Each scientist’s career lasts T = 15,000 timesteps
 
 * In one specific case of low startup costs (c = 10, see below), career length was reduced to 5000 time-steps for computational efficiency, without affecting the simulation results
 
+- These both claims are not enforced by the code, but 15000 is the parameters set in the analysis. __I could not find a mention of "5000" in the Main_CompetitionSimulation_Code_OSF.R (Version: 4) code__.
+
+- __2 snippets below are from the original, pre-refactoring code__
+
+```
+#total population size
+num_players <- 120
+```
+
+```
+#              LIFE   MAX_PER_Q,   G,    Rep,   SCS,  SCS2,   E_RATE, DECAY,     B_NEG)
+run_complexsim(15000, max_on_q,   500,   50,   start_c,   1,   c(5),  decay_2nd, ben_neg)
+```
+
+## 09 
+
 * Once their career has started, a scientist collects data until they reach their desired sample size as dictated by their respective s value. The number of time steps required to do this. cs represents the sample cost: the number of time steps needed to acquire one data point (fixed at 1). c represents the startup cost: the number of time steps needed to set up a study.
 
+- That is precisely how the time costs are set:
+
+```
+get_time_cost_for_each_question <- function(scientist_df, sample_cost, startup_cost) {
+  sample_sizes <- scientist_df$ss
+  time_cost_for_each_question <- sample_sizes * sample_cost + startup_cost
+  return(time_cost_for_each_question)
+}
+```
+ 
+The times are updated every cycle:
+
+```
+time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
+```
+
+## 10 
 * We assume that c is independent of s.
+
+- They are independent parameters in all functions
+
+##11
 
 * For questions with a true effect (e > 0), a scientist obtains a statistically-significant result with probability pwr.
 
+- That is present in the code the following snippets.
+
+Get a power value usint the "pwr.t.test" function:
+
+```
+get_t_test_powers <-
+  function(ss_of_testers,
+           questions_e_size,
+           questions_they_are_working_on) {
+    as.numeric(
+      pwr.t.test(
+        n = ss_of_testers,
+        d = questions_e_size[questions_they_are_working_on],
+        sig.level = 0.05,
+        type = "two.sample"
+      )[4]$power
+    )
+  }
+```
+Then, a random number is sampled from an uniform distribution. If the number is less than the power, it returs "TRUE", effectively mimicking the statistical power.
+
+```
+check_results_scientists_got <- function(num_testers, powers) {
+  runif(num_testers, 0, 1) < powers
+  
+```
+## 12
+
 * For questions with no true effect (e = 0), a scientist obtains a statistically-significant result with probability α.
 
-* We assume that the results of all completed studies are published, but that there may be bias against negative results (see below).
+- In the function used for power, if the effect is 0, the reported "power" is 0.05. Even though power is not defined in that case, the code behaves as described. 
+Example run:
 
+```
+> as.numeric(
++     pwr.t.test(
++         n = 3,
++         d = 0,
++         sig.level = 0.05,
++         type = "two.sample"
++     )[4]$power)
+[1] 0.05
+```
+## 13
 * Once a scientist publishes a result, two parameters determine the scientist’s payoff: the novelty of the result, v, and whether the result is positive (i.e., significant) or negative (i.e., non-significant)
 
+- Both characteristics are modelled by the code (see below).
+
+## 14
 * The novelty of a result is calculated as: ni = (1/(1+ number_of_prior_results)^d where d (the decay) determines the severity of the cost of being scooped
+- That is exacly what is modelled: 
+```
+calculate_novelty <- function(num_prior, decay) {
+  (1 / (1 + num_prior))^decay
+}
 
+```
+
+## 15
 * For negative results, scientists receive payoff vbn, where 0 ≤ bn ≤ 1
+- That is exacly what is modelled: 
+```
+calculate_payoff <-
+  function(results_scientists_got,
+           i,
+           novelty_of_result,
+           b_neg) {
+    if (results_scientists_got[i]) {
+      payoff <- novelty_of_result
+    } else {
+      payoff <- novelty_of_result * b_neg
+    }
+  }
+```
 
+## 15
 * After publishing, the scientist moves to the next open research question (i.e., one with fewer than m other scientists working on it)
 
+- That seems to be true, however it is hard to get the details of the code. It seems like the first bit get "TRUE" for questions which are not full, and "TRUE" for question ids that have not been published. They all move to the same question.
+
+```
+get_next_question <-
+  function(questions_n_on_q,
+           largest_q_avail,
+           max_scientists_per_q,
+           question_ids,
+           max_previously_published_questions) {
+    dum1 <- questions_n_on_q[1:largest_q_avail] < max_scientists_per_q
+    dum2 <-
+      question_ids[1:largest_q_avail] > max_previously_published_questions
+    dum <- dum1 & dum2
+    next_q <- match(TRUE, dum)
+    return(next_q)
+  }
+
+```
+
+## 16 
 * All other scientists working on the question corresponding to the newly-published result abandon that question with a probability determined by their individual a value.
 
-**Innacurate.**
-In the code is possible that multiple scientists publish at exactly the same time. The way it is written gives the impression that publishing at the same time is not possible. 
+This seems **Innacurate.**The way it is written gives the impression that publishing at the same time is not possible. In the code is possible that multiple scientists publish at exactly the same time and that actually happens, as scientists with same sample size publish at the same time.
+It could be reworded to "to the newly-published result (or results)" or similar
 
-As of note, it could be changed in the code by adding an element of randomness: it could take a bit more or a bit less depending on a "luck" parameter. 
+The moving is done by the following loop:
 
+```
+
+for (i in 1:number_of_testers) {
+        next_question <- get_next_question(
+          scientists_per_question,
+          largest_question_id_available,
+          max_scientists_per_q,
+          ids_for_questions,
+          max_previously_published_question
+        )
+        scientists_per_question <- update_scientists_per_question(scientists_per_question,
+          question_to_abandon = questions_they_are_working_on,
+          question_to_go_to = next_question
+        )
+        scientist_df$question[testers_ids[i]] <- next_question
+      }
+```
+
+
+## 17
 * In order to prevent scientists from being persistently “stuck” on the same questions as the scientist who just scooped them, we assume that scientists who abandon move to a different question than the one assigned to their scooper
 
+- That is exaclty what the code does. 
+
+```
+make_checks_and_get_first_question_available <- function(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q, ids_for_questions, max_of_scoopers_questions) {
+  checker_for_questions_not_full <- check_if_questions_are_not_full(scientists_per_question, largest_question_for_scooped_scientists, max_scientists_per_q)
+
+  checker_for_questions_not_taken_by_scoopers <- check_which_questions_have_not_been_taken_by_scoopers(ids_for_questions, largest_question_for_scooped_scientists, max_of_scoopers_questions)
+
+  checker_for_questions_available <- checker_for_questions_not_full & checker_for_questions_not_taken_by_scoopers
+
+  first_question_available <- get_first_question_available(checker_for_questions_available)
+}
+```
+
+## 18
 * This process repeats until scientists reach the end of their careers, at which point all scientists retire.
 
+- The process occurs indeed until the "lifespan" is reached:
+
+```
+   while (current_time_period < lifespan) {
+      print(current_time_period)
+
+      # Set up time-related parameters ----
+
+      time_to_next_event <- get_time_to_next_event(time_cost_for_each_question, lifespan, current_time_period)
+      print(time_to_next_event)
+      time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
+      current_time_period <- current_time_period + time_to_next_event
+  
+      # And the code continues (...)
+  }
+```
+
+## 19
 * Upon retiring, each scientist’s “fitness” is calculated as proportional to the total number of points that they acquired during their career.
 
 * A new (non-overlapping) generation of scientists is then created, with their s and a values sampled from members of the previous generation, weighted by fitness.

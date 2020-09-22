@@ -353,8 +353,18 @@ make_checks_and_get_first_question_available <- function(scientists_per_question
 
 ## 19
 * Upon retiring, each scientist’s “fitness” is calculated as proportional to the total number of points that they acquired during their career.
-
 * A new (non-overlapping) generation of scientists is then created, with their s and a values sampled from members of the previous generation, weighted by fitness.
+
+- This seems to be represented in the code. In original code snippets: 
+
+```
+fitness2 <- fitness / sum(fitness)
+ss <- sample(ss,
+             size = rounded_popsize,
+             replace = TRUE,
+             prob = fitness2)
+```
+
 
 * We assume that inheritance is noisy: once a parent is selected to “reproduce,” the sample size, s, of its “offspring” scientist is drawn from a normal distribution with a mean corresponding to the parent’s value and a standard deviation of 2
 

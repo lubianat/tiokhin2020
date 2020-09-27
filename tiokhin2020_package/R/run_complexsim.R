@@ -118,11 +118,11 @@ run_complexsim <- function(lifespan,
                                                      rounded_popsize)
 
   
-                  abandon_probabilities <- get_abandon_probabilities_based_on_fitness(abandon_probabilities,
+                  abandon_probabilities <- select_abandon_probabilities_that_reproduce(abandon_probabilities,
                                                                                       rounded_popsize,
                                                                                       normalized_fitness)
 
-                  abandon_probabilities <- mutate_abandon_probabilities(abandon_probabilities,
+                  abandon_probabilities <- reproduce_abandon_probabilities(abandon_probabilities,
                                                                         rounded_popsize)
 
                   # save state of the population sample sizes and abandonment probabilities
@@ -206,12 +206,12 @@ select_sample_sizes_that_reproduce <- function(sample_size, rounded_popsize, nor
   )
 }
 
-mutate_abandon_probabilities <- function(abandon_probabilities, rounded_popsize) {
+reproduce_abandon_probabilities <- function(abandon_probabilities, rounded_popsize) {
   abandon_probabilities + rnorm(rounded_popsize, 0, 0.01)
   abandon_probabilities <- pmin(pmax(abandon_probabilities, 0), 1)
 }
 
-get_abandon_probabilities_based_on_fitness <- function(abandon_probabilities, rounded_popsize, normalized_fitness) {
+select_abandon_probabilities_that_reproduce <- function(abandon_probabilities, rounded_popsize, normalized_fitness) {
   sample(abandon_probabilities,
          size = rounded_popsize,
          replace = TRUE,

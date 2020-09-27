@@ -279,6 +279,7 @@ check_results_scientists_got <- function(num_testers, powers) {
   runif(num_testers, 0, 1) < powers
   
 ```
+
 ## 13
 
 ### Claim
@@ -306,7 +307,7 @@ Example run:
 ### Report
 - Both characteristics are modelled by the code (see reports below).
 
-## 14
+## 15
 ### Claim
 * The novelty of a result is calculated as: ni = (1/(1+ number_of_prior_results)^d where d (the decay) determines the severity of the cost of being scooped
 
@@ -319,7 +320,7 @@ calculate_novelty <- function(num_prior, decay) {
 
 ```
 
-## 15
+## 16
 ### Claim
 * For negative results, scientists receive payoff vbn, where 0 ≤ bn ≤ 1
 
@@ -339,7 +340,7 @@ calculate_payoff <-
   }
 ```
 
-## 16
+## 17
 ### Claim
 * After publishing, the scientist moves to the next open research question (i.e., one with fewer than m other scientists working on it)
 
@@ -364,7 +365,7 @@ get_next_question <-
 
 ```
 
-## 17
+## 18
 ### Claim 
 * All other scientists working on the question corresponding to the newly-published result abandon that question with a probability determined by their individual a value.
 
@@ -393,7 +394,7 @@ for (i in 1:number_of_testers) {
 ```
 
 
-## 18
+## 19
 ### Claim 
 * In order to prevent scientists from being persistently “stuck” on the same questions as the scientist who just scooped them, we assume that scientists who abandon move to a different question than the one assigned to their scooper
 
@@ -412,7 +413,7 @@ make_checks_and_get_first_question_available <- function(scientists_per_question
 }
 ```
 
-## 19
+## 20
 ### Claim 
 * This process repeats until scientists reach the end of their careers, at which point all scientists retire.
 
@@ -434,58 +435,92 @@ make_checks_and_get_first_question_available <- function(scientists_per_question
   }
 ```
 
-## 20
+## 21
 ### Claim 
 * Upon retiring, each scientist’s “fitness” is calculated as proportional to the total number of points that they acquired during their career.
 * A new (non-overlapping) generation of scientists is then created, with their s and a values sampled from members of the previous generation, weighted by fitness.
 
 ### Report
-- This seems to be represented in the code. In original code snippets: 
+- This seems to be represented in the code: 
 
 ```
-fitness2 <- fitness / sum(fitness)
-ss <- sample(ss,
-             size = rounded_popsize,
-             replace = TRUE,
-             prob = fitness2)
+fitness <- outcome_list[[1]]$payoff
+normalized_fitness <- fitness / sum(fitness)
+                  
+                  
+sample_size <- select_sample_sizes_that_reproduce(sample_size,
+                                                  rounded_popsize,
+                                                  normalized_fitness)
 ```
-
-## 21
-### Claim 
-* We assume that inheritance is noisy: once a parent is selected to “reproduce,” the sample size, s, of its “offspring” scientist is drawn from a normal distribution with a mean corresponding to the parent’s value and a standard deviation of 2
-
-### Report
-
-
 
 ## 22
 ### Claim 
+* We assume that inheritance is noisy: once a parent is selected to “reproduce,” the sample size, s, of its “offspring” scientist is drawn from a normal distribution with a mean corresponding to the parent’s value and a standard deviation of 2
 * Offspring s values are rounded to the nearest integer and truncated to remain in [2, 1000].
-
-
-### Report
-
-## 23
-### Claim 
 * Values of s < 2 are set to 2 because two-sample t-tests require at least 2 samples per group.
 
 ### Report
+I could not see _scientists_ being selected to reproduce. The new generation parameters are biased by the success (fitness) of the previous generation, but *abandon probabilities* and *sample sizes* are sampled independently.
 
+The math is exactly as described:
 
-## 24
+```
+select_sample_sizes_that_reproduce <- function(sample_size, rounded_popsize, normalized_fitness) {
+  sample(sample_size,
+         size = rounded_popsize,
+         replace = TRUE,
+         prob = normalized_fitness
+  )
+}
+
+reproduce_sample_sizes <- function(sample_size, rounded_popsize) {
+  sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2))
+  sample_size <- pmin(pmax(sample_size, 2), 1000)
+}
+
+```
+
+## 23
 ### Claim 
 * Similarly, the abandonment probabilities of offspring scientists, a, are drawn from a normal distribution with a mean corresponding to their parent’s value and a standard deviation of 0.01, truncated to remain in [0, 1].
 
 ### Report
+As mentioned previously,  *abandon probabilities* and *sample sizes* are sampled independently.
 
+```
+The math is exactly as described:
 
-## 25
+select_abandon_probabilities_that_reproduce <- function(abandon_probabilities,
+                                                        rounded_popsize, 
+                                                        normalized_fitness) {
+  sample(abandon_probabilities,
+         size = rounded_popsize,
+         replace = TRUE,
+         prob = normalized_fitness)
+}
+
+reproduce_abandon_probabilities <- function(abandon_probabilities, rounded_popsize) {
+  abandon_probabilities + rnorm(rounded_popsize, 0, 0.01)
+  abandon_probabilities <- pmin(pmax(abandon_probabilities, 0), 1)
+}
+
+```
+
+## 24
 ### Claim 
 * To ensure convergence to equilibrium sample sizes (see Supplementary Section 7), the evolutionary process proceeds for 500 generations, at which point the simulation stops.
 
 ### Report
 
-## 26
+I have not looked at the convergence analysis, but the main code is run for 500 generations. Original code:
+
+```
+#              LIFE   MAX_PER_Q,   G,    Rep,   SCS,  SCS2,   E_RATE, DECAY,     B_NEG)
+run_complexsim(15000, max_on_q,   500,   50,   start_c,   1,   c(5),  decay_2nd, ben_neg)
+
+```
+
+## 25
 
 ### Claim
 Parameter Definition
@@ -507,3 +542,12 @@ bn - Payoff from publishing negative results, relative to positive results - 0, 
 
 
 ### Report
+
+For that check, I`ve revised only the primary code for adherence. 
+
+- Main_CompetitionSimulation_Code_OSF.R (Version: 4):
+
+  - Those are the exact parameters used. I could not find the code for the "5000" lifespan when c = 10, though.
+
+
+The parameters used for the secondary analysis are not taken into account by the table.

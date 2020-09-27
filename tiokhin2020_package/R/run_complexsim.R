@@ -110,7 +110,7 @@ run_complexsim <- function(lifespan,
                   normalized_fitness <- fitness / sum(fitness)
                   
                   
-                  sample_size <- get_sample_sizes_based_on_fitness(sample_size,
+                  sample_size <- select_sample_sizes_that_reproduce(sample_size,
                                                                    rounded_popsize,
                                                                    normalized_fitness)
 
@@ -198,7 +198,7 @@ mutate_sample_sizes <- function(sample_size, rounded_popsize) {
   sample_size <- pmin(pmax(sample_size, 2), 1000)
 }
 
-get_sample_sizes_based_on_fitness <- function(sample_size, rounded_popsize, normalized_fitness) {
+select_sample_sizes_that_reproduce <- function(sample_size, rounded_popsize, normalized_fitness) {
   sample(sample_size,
          size = rounded_popsize,
          replace = TRUE,

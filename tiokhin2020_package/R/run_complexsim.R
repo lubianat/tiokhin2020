@@ -109,15 +109,15 @@ run_complexsim <- function(lifespan,
 
                   # calculate fitness and manage reproduction
                   normalized_fitness <- fitness / sum(fitness)
+                  
+                  
                   sample_size <- sample(sample_size,
                     size = rounded_popsize,
                     replace = TRUE,
                     prob = normalized_fitness
                   )
 
-                  # Note: change sd to change size of mutations
-                  sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2))
-                  sample_size <- pmin(pmax(sample_size, 2), 1000)
+                  sample_size <- mutate_sample_sizes(sample_size, rounded_popsize)
 
                   abandon_probabilities <- sample(abandon_probabilities, size = rounded_popsize, replace = TRUE, prob = normalized_fitness)
                   abandon_probabilities <- abandon_probabilities + rnorm(rounded_popsize, 0, 0.01) # change sd to change size of mutations
@@ -189,4 +189,9 @@ run_complexsim <- function(lifespan,
       }
     }
   }
+}
+
+mutate_sample_sizes <- function(sample_size, rounded_popsize) {
+  sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2))
+  sample_size <- pmin(pmax(sample_size, 2), 1000)
 }

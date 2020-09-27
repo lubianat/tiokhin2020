@@ -26,4 +26,3 @@
 #' data(base_sim)
 #' base_sim
 "base_sim"
-

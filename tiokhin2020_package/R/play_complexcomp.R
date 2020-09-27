@@ -141,7 +141,7 @@ play_complexcomp <-
     # Start the simulation ----
     print(lifespan)
     print(current_time_period)
-    
+
     while (current_time_period < lifespan) {
       print(current_time_period)
 

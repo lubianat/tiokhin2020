@@ -33,7 +33,6 @@ run_complexsim <- function(lifespan,
                            max_sample_size,
                            min_aban = 0,
                            max_aban = 1) {
-  
   max_scientists_per_q_list <- max_scientists_per_q
 
   scooped_decay <- scooped_decay
@@ -78,9 +77,11 @@ run_complexsim <- function(lifespan,
 
                 # initialize the population, for each repeat
                 rounded_popsize <- round(num_scientists / max_scientists_per_q) * max_scientists_per_q
-                sample_size <- round(runif(rounded_popsize,
-                                           min_sample_size,
-                                           max_sample_size))
+                sample_size <- round(runif(
+                  rounded_popsize,
+                  min_sample_size,
+                  max_sample_size
+                ))
                 abandon_probabilities <- runif(rounded_popsize, min_aban, max_aban)
 
                 # start looping
@@ -88,31 +89,34 @@ run_complexsim <- function(lifespan,
 
                   # play scientists against each other
                   print(lifespan)
-                  outcome_list <- play_complexcomp(evolution = TRUE, 
-                                                   lifespan = lifespan,
-                                                   num_scientists = num_scientists,
-                                                   startup_cost = startup_cost,
-                                                   max_scientists_per_q = max_scientists_per_q,
-                                                   sample_cost = sample_cost,
-                                                   exp_shape = exp_rate, 
-                                                   decay = dcy,
-                                                   b_neg = bn,
-                                                   abandon_prob = abandon_probabilities,
-                                                   min_sample_size = min_sample_size,
-                                                   max_sample_size = max_sample_size,
-                                                   ss = sample_size)
-                  
+                  outcome_list <- play_complexcomp(
+                    evolution = TRUE,
+                    lifespan = lifespan,
+                    num_scientists = num_scientists,
+                    startup_cost = startup_cost,
+                    max_scientists_per_q = max_scientists_per_q,
+                    sample_cost = sample_cost,
+                    exp_shape = exp_rate,
+                    decay = dcy,
+                    b_neg = bn,
+                    abandon_prob = abandon_probabilities,
+                    min_sample_size = min_sample_size,
+                    max_sample_size = max_sample_size,
+                    ss = sample_size
+                  )
+
                   fitness <- outcome_list[[1]]$payoff
 
                   # calculate fitness and manage reproduction
                   normalized_fitness <- fitness / sum(fitness)
                   sample_size <- sample(sample_size,
-                               size = rounded_popsize,
-                               replace = TRUE,
-                               prob = normalized_fitness)
-                  
+                    size = rounded_popsize,
+                    replace = TRUE,
+                    prob = normalized_fitness
+                  )
+
                   # Note: change sd to change size of mutations
-                  sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2)) 
+                  sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2))
                   sample_size <- pmin(pmax(sample_size, 2), 1000)
 
                   abandon_probabilities <- sample(abandon_probabilities, size = rounded_popsize, replace = TRUE, prob = normalized_fitness)

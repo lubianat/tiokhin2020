@@ -107,7 +107,6 @@ run_complexsim <- function(lifespan,
 
                   fitness <- outcome_list[[1]]$payoff
 
-                  # calculate fitness and manage reproduction
                   normalized_fitness <- fitness / sum(fitness)
                   
                   
@@ -123,9 +122,8 @@ run_complexsim <- function(lifespan,
                                                                                       rounded_popsize,
                                                                                       normalized_fitness)
 
-                  
-                  # change sd to change size of mutations
-                  abandon_probabilities <- mutate_abandon_probabilities(abandon_probabilities, rounded_popsize)
+                  abandon_probabilities <- mutate_abandon_probabilities(abandon_probabilities,
+                                                                        rounded_popsize)
 
                   # save state of the population sample sizes and abandonment probabilities
                   if (single_region) {

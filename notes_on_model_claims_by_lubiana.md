@@ -1,5 +1,5 @@
 
-# Model clao,s
+# Model claims
 
 I will write long reports for some claims, but not for all. 
 
@@ -28,9 +28,46 @@ The code rolls the dice for abandonment for every publication about their ongoin
 ## 02
 * Scientists transmit their methods to trainees, so the distributions of these parameters can evolve across generations
 
+- Even though trainer-trainee relations are not explictly modeled, the code 
+weighs sample size and abandon probabilities by the fitness:
+
+```
+fitness <- outcome_list[[1]]$payoff
+
+normalized_fitness <- fitness / sum(fitness)
+
+
+sample_size <- get_sample_sizes_based_on_fitness(sample_size,
+                                                 rounded_popsize,
+                                                 normalized_fitness)
+
+sample_size <- mutate_sample_sizes(sample_size,
+                                   rounded_popsize)
+
+
+abandon_probabilities <- get_abandon_probabilities_based_on_fitness(abandon_probabilities,
+                                                                    rounded_popsize,
+                                                                    normalized_fitness)
+
+abandon_probabilities <- mutate_abandon_probabilities(abandon_probabilities,
+                                                      rounded_popsize)
+```
 
 ## 03
 * Each population is initialized by sampling n integer values of s from a uniform distribution [2, 1000] and n real-numbered values of a from a uniform distribution [0, 1].
+
+- This is represented by the following snippet (composed from original code) :
+
+```
+min_sample_size <- 2
+max_sample_size <- 1000
+min_aban <- 0
+max_aban <- 1
+
+ss <- round(runif(rounded_popsize, min_sample_size, max_sample_size))
+aban <- runif(rounded_popsize, min_aban, max_aban)
+
+```
 
 ## 04
 * On any given question, a scientist’s statistical power, pwr, can take on any real-numbered value in [0.05, 1].

@@ -111,15 +111,19 @@ run_complexsim <- function(lifespan,
                   normalized_fitness <- fitness / sum(fitness)
                   
                   
-                  sample_size <- get_sample_sizes_based_on_fitness(sample_size, rounded_popsize, normalized_fitness)
+                  sample_size <- get_sample_sizes_based_on_fitness(sample_size,
+                                                                   rounded_popsize,
+                                                                   normalized_fitness)
 
-                  sample_size <- mutate_sample_sizes(sample_size, rounded_popsize)
+                  sample_size <- mutate_sample_sizes(sample_size,
+                                                     rounded_popsize)
 
   
-                  abandon_probabilities <- sample(abandon_probabilities,
-                                                  size = rounded_popsize,
-                                                  replace = TRUE,
-                                                  prob = normalized_fitness)
+                  abandon_probabilities <- get_abandon_probabilities_based_on_fitness(abandon_probabilities,
+                                                                                      rounded_popsize,
+                                                                                      normalized_fitness)
+
+                  
                   # change sd to change size of mutations
                   abandon_probabilities <- abandon_probabilities + rnorm(rounded_popsize, 0, 0.01)
                   abandon_probabilities <- pmin(pmax(abandon_probabilities, 0), 1)
@@ -203,4 +207,11 @@ get_sample_sizes_based_on_fitness <- function(sample_size, rounded_popsize, norm
          replace = TRUE,
          prob = normalized_fitness
   )
+}
+
+get_abandon_probabilities_based_on_fitness <- function(abandon_probabilities, rounded_popsize, normalized_fitness) {
+  sample(abandon_probabilities,
+         size = rounded_popsize,
+         replace = TRUE,
+         prob = normalized_fitness)
 }

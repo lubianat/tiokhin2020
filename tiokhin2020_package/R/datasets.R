@@ -27,34 +27,3 @@
 #' base_sim
 "base_sim"
 
-
-set.seed(3)
-evolution = FALSE
-lifespan = 500
-ss = NA
-max_scientists_per_q = 4
-startup_cost =   100
-sample_cost =    1
-exp_rate =      5
-decay =         10
-b_neg =      1
-abandon_prob =    0.5
-num_scientists = 120
-min_sample_size = 3
-max_sample_size = 12
-
-generations = 3
-simulation_repeats = 1
-
-run_complexsim(lifespan = lifespan,
-               max_scientists_per_q = max_scientists_per_q ,
-               generations = generations,
-               simulation_repeats = simulation_repeats ,
-               startup_costs = startup_cost,
-               sample_costs = sample_cost,
-               exp_rate = exp_rate ,
-               scooped_decay = decay,
-               b_neg = b_neg,
-               num_scientists = num_scientists,
-               min_sample_size = min_sample_size,
-               max_sample_size = max_sample_size)

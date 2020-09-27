@@ -114,7 +114,7 @@ run_complexsim <- function(lifespan,
                                                                    rounded_popsize,
                                                                    normalized_fitness)
 
-                  sample_size <- mutate_sample_sizes(sample_size,
+                  sample_size <- reproduce_sample_sizes(sample_size,
                                                      rounded_popsize)
 
   
@@ -193,7 +193,7 @@ run_complexsim <- function(lifespan,
   }
 }
 
-mutate_sample_sizes <- function(sample_size, rounded_popsize) {
+reproduce_sample_sizes <- function(sample_size, rounded_popsize) {
   sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2))
   sample_size <- pmin(pmax(sample_size, 2), 1000)
 }

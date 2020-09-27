@@ -26,7 +26,11 @@ The code rolls the dice for abandonment for every publication about their ongoin
 
 
 ## 02
+### Claim 
+
 * Scientists transmit their methods to trainees, so the distributions of these parameters can evolve across generations
+
+### Report 
 
 - Even though trainer-trainee relations are not explictly modeled, the code 
 weighs sample size and abandon probabilities by the fitness:
@@ -54,7 +58,11 @@ abandon_probabilities <- mutate_abandon_probabilities(abandon_probabilities,
 ```
 
 ## 03
+
+### Claim 
 * Each population is initialized by sampling n integer values of s from a uniform distribution [2, 1000] and n real-numbered values of a from a uniform distribution [0, 1].
+
+### Report 
 
 - This is represented by the following snippet (composed from original code) :
 
@@ -70,7 +78,13 @@ aban <- runif(rounded_popsize, min_aban, max_aban)
 ```
 
 ## 04
+### Claim
+
 * On any given question, a scientist’s statistical power, pwr, can take on any real-numbered value in [0.05, 1].
+
+### Report 
+
+- This is a feature of the function "pwr.t.test". See its documentation [here](https://www.rdocumentation.org/packages/pwr/versions/1.3-0/topics/pwr.t.test).  
 
 ## 05
 ### Claim
@@ -114,7 +128,7 @@ get_questions_effect_size <- function(number_of_questions, exp_shape) {
 ```
 
 
-## 05
+## 06
 ### Claim
 * Each research question has a unique id (e.g. 1, 2, 3, ….) and a maximum of m scientists can work on any given question
 
@@ -154,9 +168,13 @@ check_if_questions_are_not_full <- function(scientists_per_question, largest_que
 ```  
     
 
-## 06
+## 07
+### Claim
 * A scientist begins their career on the smallest-numbered open research question (i.e., the smallest numbered question occupied by fewer than m other scientists)
-  - That is represented in the code. This is the snipped that deals with it: 
+
+### Report 
+
+- That is represented in the code. This is the snipped that deals with it: 
 ```
 assign_scientists_to_questions <-
   function(scientist_df,
@@ -171,19 +189,24 @@ assign_scientists_to_questions <-
   - The rep function generates "n" repetitions for each question id (where "n" is the max_scientists_per_q parameter). The scientists then get assigned in order to the questions.
   
   
-## 07
+## 08
+
+### Claim
 * We do this to avoid unrealistic outcomes (e.g., all scientists working on a single question; all scientists working on different questions) 
 
+### Report
 - Even though the code does not enforce this constraint (all scientistists could work on the same question) the combination of parameters for that doesn't seem to have been used.
 
 
 
+## 09 
 
-## 08 
+### Claim
 * Each scientist’s career lasts T = 15,000 timesteps
 
 * In one specific case of low startup costs (c = 10, see below), career length was reduced to 5000 time-steps for computational efficiency, without affecting the simulation results
 
+### Report
 - These both claims are not enforced by the code, but 15000 is the parameters set in the analysis. __I could not find a mention of "5000" in the Main_CompetitionSimulation_Code_OSF.R (Version: 4) code__.
 
 - __2 snippets below are from the original, pre-refactoring code__
@@ -198,7 +221,7 @@ num_players <- 120
 run_complexsim(15000, max_on_q,   500,   50,   start_c,   1,   c(5),  decay_2nd, ben_neg)
 ```
 
-## 09 
+## 10 
 
 * Once their career has started, a scientist collects data until they reach their desired sample size as dictated by their respective s value. The number of time steps required to do this. cs represents the sample cost: the number of time steps needed to acquire one data point (fixed at 1). c represents the startup cost: the number of time steps needed to set up a study.
 
@@ -218,16 +241,19 @@ The times are updated every cycle:
 time_cost_for_each_question <- time_cost_for_each_question - time_to_next_event
 ```
 
-## 10 
-* We assume that c is independent of s.
+## 11
 
+### Claim
+* We assume that c is independent of s.
+### Report
 - They are independent parameters in all functions
 
-##11
+## 12
 
+### Claim
 * For questions with a true effect (e > 0), a scientist obtains a statistically-significant result with probability pwr.
-
-- That is present in the code the following snippets.
+### Report
+- That is present in the code in the following snippets.
 
 Get a power value usint the "pwr.t.test" function:
 
@@ -253,10 +279,12 @@ check_results_scientists_got <- function(num_testers, powers) {
   runif(num_testers, 0, 1) < powers
   
 ```
-## 12
+## 13
 
+### Claim
 * For questions with no true effect (e = 0), a scientist obtains a statistically-significant result with probability α.
 
+### Report
 - In the function used for power, if the effect is 0, the reported "power" is 0.05. Even though power is not defined in that case, the code behaves as described. 
 Example run:
 
@@ -270,13 +298,19 @@ Example run:
 +     )[4]$power)
 [1] 0.05
 ```
-## 13
-* Once a scientist publishes a result, two parameters determine the scientist’s payoff: the novelty of the result, v, and whether the result is positive (i.e., significant) or negative (i.e., non-significant)
-
-- Both characteristics are modelled by the code (see below).
 
 ## 14
+### Claim
+* Once a scientist publishes a result, two parameters determine the scientist’s payoff: the novelty of the result, v, and whether the result is positive (i.e., significant) or negative (i.e., non-significant)
+
+### Report
+- Both characteristics are modelled by the code (see reports below).
+
+## 14
+### Claim
 * The novelty of a result is calculated as: ni = (1/(1+ number_of_prior_results)^d where d (the decay) determines the severity of the cost of being scooped
+
+### Report
 - That is exacly what is modelled: 
 ```
 calculate_novelty <- function(num_prior, decay) {
@@ -286,7 +320,10 @@ calculate_novelty <- function(num_prior, decay) {
 ```
 
 ## 15
+### Claim
 * For negative results, scientists receive payoff vbn, where 0 ≤ bn ≤ 1
+
+### Report
 - That is exacly what is modelled: 
 ```
 calculate_payoff <-
@@ -302,10 +339,13 @@ calculate_payoff <-
   }
 ```
 
-## 15
+## 16
+### Claim
 * After publishing, the scientist moves to the next open research question (i.e., one with fewer than m other scientists working on it)
 
-- That seems to be true, however it is hard to get the details of the code. It seems like the first bit get "TRUE" for questions which are not full, and "TRUE" for question ids that have not been published. They all move to the same question.
+### Report
+- That seems to be true, however it is hard to get the details of the code. In the code below it seems like the first bit (dum1) get "TRUE" for questions which are not full, and "TRUE" for question ids that have not been published. 
+- All move to the same question.
 
 ```
 get_next_question <-
@@ -324,10 +364,12 @@ get_next_question <-
 
 ```
 
-## 16 
+## 17
+### Claim 
 * All other scientists working on the question corresponding to the newly-published result abandon that question with a probability determined by their individual a value.
 
-This seems **Innacurate.**The way it is written gives the impression that publishing at the same time is not possible. In the code is possible that multiple scientists publish at exactly the same time and that actually happens, as scientists with same sample size publish at the same time.
+### Report
+This wording is slightly **Innacurate.** The way it is written gives the impression that publishing at the same time is not possible. In the code is possible that multiple scientists publish at exactly the same time and that actually happens, as scientists with same sample size publish at the same time.
 It could be reworded to "to the newly-published result (or results)" or similar
 
 The moving is done by the following loop:
@@ -351,9 +393,11 @@ for (i in 1:number_of_testers) {
 ```
 
 
-## 17
+## 18
+### Claim 
 * In order to prevent scientists from being persistently “stuck” on the same questions as the scientist who just scooped them, we assume that scientists who abandon move to a different question than the one assigned to their scooper
 
+### Report
 - That is exaclty what the code does. 
 
 ```
@@ -368,9 +412,11 @@ make_checks_and_get_first_question_available <- function(scientists_per_question
 }
 ```
 
-## 18
+## 19
+### Claim 
 * This process repeats until scientists reach the end of their careers, at which point all scientists retire.
 
+### Report
 - The process occurs indeed until the "lifespan" is reached:
 
 ```
@@ -388,10 +434,12 @@ make_checks_and_get_first_question_available <- function(scientists_per_question
   }
 ```
 
-## 19
+## 20
+### Claim 
 * Upon retiring, each scientist’s “fitness” is calculated as proportional to the total number of points that they acquired during their career.
 * A new (non-overlapping) generation of scientists is then created, with their s and a values sampled from members of the previous generation, weighted by fitness.
 
+### Report
 - This seems to be represented in the code. In original code snippets: 
 
 ```
@@ -402,19 +450,44 @@ ss <- sample(ss,
              prob = fitness2)
 ```
 
-
+## 21
+### Claim 
 * We assume that inheritance is noisy: once a parent is selected to “reproduce,” the sample size, s, of its “offspring” scientist is drawn from a normal distribution with a mean corresponding to the parent’s value and a standard deviation of 2
 
+### Report
+
+
+
+## 22
+### Claim 
 * Offspring s values are rounded to the nearest integer and truncated to remain in [2, 1000].
 
+
+### Report
+
+## 23
+### Claim 
 * Values of s < 2 are set to 2 because two-sample t-tests require at least 2 samples per group.
 
-* Similarly, the abandonment probabilities of offspring scientists, a, are drawn from a normal distribution with a mean corresponding to their parent’s value and a standard deviation of 0.01, truncated to remain in [0, 1
+### Report
 
+
+## 24
+### Claim 
+* Similarly, the abandonment probabilities of offspring scientists, a, are drawn from a normal distribution with a mean corresponding to their parent’s value and a standard deviation of 0.01, truncated to remain in [0, 1].
+
+### Report
+
+
+## 25
+### Claim 
 * To ensure convergence to equilibrium sample sizes (see Supplementary Section 7), the evolutionary process proceeds for 500 generations, at which point the simulation stops.
 
+### Report
 
+## 26
 
+### Claim
 Parameter Definition
 
 Value/Range
@@ -431,3 +504,6 @@ c - Startup cost: number of time steps to set up a study - 10, 100, 200, 400
 m - Maximum number of scientists per research question - 1, 2, 4, 8
 d - Decay parameter determining the penalty for being scooped - 0, 0.15, 0.40, 1, 10
 bn - Payoff from publishing negative results, relative to positive results - 0, 0.25, 0.5, 0.75, 1
+
+
+### Report

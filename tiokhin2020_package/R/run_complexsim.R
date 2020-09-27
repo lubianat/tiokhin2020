@@ -33,15 +33,10 @@ run_complexsim <- function(lifespan,
                            max_sample_size,
                            min_aban = 0,
                            max_aban = 1) {
-  lifespan <- lifespan
-  popsize <- num_scientists
-  max_per_q <- max_scientists_per_q
-  gens <- generations
-  repeats <- simulation_repeats
-  startup_costs <- startup_costs
-  sample_costs <- sample_costs
-  exp_rate <- exp_rate
-  decay <- scooped_decay
+  
+  max_scientists_per_q_list <- max_scientists_per_q
+
+  scooped_decay <- scooped_decay
   b_neg <- b_neg
 
   eq.samplecost <- vector()
@@ -56,15 +51,15 @@ run_complexsim <- function(lifespan,
   eq.life <- vector()
   res_list_all <- list()
 
-  single_region <- length(max_per_q) == 1 && length(repeats) == 1 && length(startup_costs) == 1 && length(sample_costs) == 1 &&
-    length(exp_rate) == 1 && length(decay) == 1 && length(b_neg) == 1
+  single_region <- length(max_scientists_per_q_list) == 1 && length(simulation_repeats) == 1 && length(startup_costs) == 1 && length(sample_costs) == 1 &&
+    length(exp_rate) == 1 && length(scooped_decay) == 1 && length(b_neg) == 1
 
-  mean_ss <- rep(0, gens)
-  lower_ss <- rep(0, gens)
-  upper_ss <- rep(0, gens)
-  mean_aban <- rep(0, gens)
-  lower_aban <- rep(0, gens)
-  upper_aban <- rep(0, gens)
+  mean_ss <- rep(0, generations)
+  lower_ss <- rep(0, generations)
+  upper_ss <- rep(0, generations)
+  mean_aban <- rep(0, generations)
+  lower_aban <- rep(0, generations)
+  upper_aban <- rep(0, generations)
 
   # tracker
   zz <- 1
@@ -72,62 +67,67 @@ run_complexsim <- function(lifespan,
   for (rate in exp_rate) {
     for (sample_cost in sample_costs) {
       for (startup_cost in startup_costs) {
-        for (comp_n in max_per_q) {
-          for (dcy in decay) {
+        for (max_scientists_per_q in max_scientists_per_q_list) {
+          for (dcy in scooped_decay) {
             for (bn in b_neg) {
 
               # list to store all results across repeats
-              results_list <- vector("list", repeats)
+              results_list <- vector("list", simulation_repeats)
 
-              for (rep in 1:repeats) {
+              for (rep in 1:simulation_repeats) {
 
                 # initialize the population, for each repeat
-                rounded_popsize <- round(popsize / comp_n) * comp_n
-                ss <- round(runif(rounded_popsize, min_sample_size, max_sample_size))
-                aban <- runif(rounded_popsize, min_aban, max_aban)
+                rounded_popsize <- round(num_scientists / max_scientists_per_q) * max_scientists_per_q
+                sample_size <- round(runif(rounded_popsize,
+                                           min_sample_size,
+                                           max_sample_size))
+                abandon_probabilities <- runif(rounded_popsize, min_aban, max_aban)
 
                 # start looping
-                for (gen in 1:gens) {
+                for (gen in 1:generations) {
 
                   # play scientists against each other
                   print(lifespan)
                   outcome_list <- play_complexcomp(evolution = TRUE, 
                                                    lifespan = lifespan,
-                                                   num_scientists = popsize,
+                                                   num_scientists = num_scientists,
                                                    startup_cost = startup_cost,
-                                                   max_scientists_per_q = comp_n,
+                                                   max_scientists_per_q = max_scientists_per_q,
                                                    sample_cost = sample_cost,
                                                    exp_shape = exp_rate, 
                                                    decay = dcy,
                                                    b_neg = bn,
-                                                   abandon_prob = aban,
+                                                   abandon_prob = abandon_probabilities,
                                                    min_sample_size = min_sample_size,
                                                    max_sample_size = max_sample_size,
-                                                   ss = ss)
+                                                   ss = sample_size)
+                  
                   fitness <- outcome_list[[1]]$payoff
 
                   # calculate fitness and manage reproduction
-                  fitness2 <- fitness / sum(fitness)
-                  ss <- sample(ss,
+                  normalized_fitness <- fitness / sum(fitness)
+                  sample_size <- sample(sample_size,
                                size = rounded_popsize,
                                replace = TRUE,
-                               prob = fitness2)
-                  ss <- round(ss + rnorm(rounded_popsize, 0, 2)) # change sd to change size of mutations
-                  ss <- pmin(pmax(ss, 2), 1000)
+                               prob = normalized_fitness)
+                  
+                  # Note: change sd to change size of mutations
+                  sample_size <- round(sample_size + rnorm(rounded_popsize, 0, 2)) 
+                  sample_size <- pmin(pmax(sample_size, 2), 1000)
 
-                  aban <- sample(aban, size = rounded_popsize, replace = TRUE, prob = fitness2)
-                  aban <- aban + rnorm(rounded_popsize, 0, 0.01) # change sd to change size of mutations
-                  aban <- pmin(pmax(aban, 0), 1)
+                  abandon_probabilities <- sample(abandon_probabilities, size = rounded_popsize, replace = TRUE, prob = normalized_fitness)
+                  abandon_probabilities <- abandon_probabilities + rnorm(rounded_popsize, 0, 0.01) # change sd to change size of mutations
+                  abandon_probabilities <- pmin(pmax(abandon_probabilities, 0), 1)
 
                   # save state of the population sample sizes and abandonment probabilities
                   if (single_region) {
-                    mean_ss[gen] <- mean_ss[gen] + mean(ss)
-                    dum <- quantile(ss, c(0.025, 0.975))
+                    mean_ss[gen] <- mean_ss[gen] + mean(sample_size)
+                    dum <- quantile(sample_size, c(0.025, 0.975))
                     lower_ss[gen] <- lower_ss[gen] + dum[[1]]
                     upper_ss[gen] <- upper_ss[gen] + dum[[2]]
 
-                    mean_aban[gen] <- mean_aban[gen] + mean(aban)
-                    dum <- quantile(aban, c(0.025, 0.975))
+                    mean_aban[gen] <- mean_aban[gen] + mean(abandon_probabilities)
+                    dum <- quantile(abandon_probabilities, c(0.025, 0.975))
                     lower_aban[gen] <- lower_aban[gen] + dum[[1]]
                     upper_aban[gen] <- upper_aban[gen] + dum[[2]]
                   }
@@ -137,11 +137,11 @@ run_complexsim <- function(lifespan,
                 eq.startupcost <- c(eq.startupcost, startup_cost)
                 eq.exprate <- c(eq.exprate, rate)
                 eq.decay <- c(eq.decay, dcy)
-                eq.samplesize <- c(eq.samplesize, mean(ss))
+                eq.samplesize <- c(eq.samplesize, mean(sample_size))
                 eq.totalfitness <- c(eq.totalfitness, sum(fitness))
-                eq.maxperq <- c(eq.maxperq, comp_n)
+                eq.maxperq <- c(eq.maxperq, max_scientists_per_q)
                 eq.b_neg <- c(eq.b_neg, bn)
-                eq.abandonprob <- c(eq.abandonprob, mean(aban))
+                eq.abandonprob <- c(eq.abandonprob, mean(abandon_probabilities))
                 eq.life <- c(eq.life, lifespan)
                 results_list[[rep]] <- outcome_list[[2]]
               } # end of repeat
@@ -152,7 +152,7 @@ run_complexsim <- function(lifespan,
               eq.result.df$eq.startupcost <- startup_cost
               eq.result.df$eq.exprate <- rate
               eq.result.df$eq.decay <- dcy
-              eq.result.df$eq.maxperq <- comp_n
+              eq.result.df$eq.maxperq <- max_scientists_per_q
               eq.result.df$eq.b_neg <- bn
               eq.result.df$eq.life <- lifespan
 
